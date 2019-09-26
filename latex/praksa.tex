@@ -139,6 +139,83 @@ Odprtokodne dirkalne igre se ponavadi zanašajo na hevristične pristope, ki tip
 
 Zgoraj omenjene metode so sicer zelo impresivne, vendar obstajajo tudi metode, ki upoštevajo dinamski model vozila pri reševanju omenjenega problema in vodijo do še ustreznejših rešitev omenjenega problema. Na drugi strani pa imamo rešitve, ki so malce preprostejše kot je uporaba kubičnih parametričnih Bézier krivulj pri generaciji dirkalne linije in pa edinstvena rešitev, ki jo nudi odprtokodni Vamos Avtomotive Simulator, kjer je za doesganje manjše ukrivlejnosti poti skozi ovinek uporabljena vergia masnih točk, ki jih povezuje torzijska vzmet. Do zglajene poti pridemo tako, da najdemo minimum potencialne energije shranjene v vzmeteh. Pri reševanju našega problema smo se odločili za seldnjo metodo, zato jo bomo v naslednjem poglavju predstavili podrobneje.
 
+\section{Algoritem glajenja poti - Vamos}
+
+Vamos Avtomotive Simulator (VAS) je odprtokodno simulacijsko okolje s poudarkom na fizičnemu modeliranju \cite{VAS}. Vamos modelira veliko večino ključnih podsistemov avtomobilov, kot so elementi pogonskega sklopa in sicer motor, sklopka, menjalnik in diferencial z omejenim zdrsom. Prav tako pa je modelirano tudi obnašanje pnevmatik pri temperaturnih vplivih, vzmetenje avtomobila in aerodinamski učinki na avtomobilih. VAS igralcem nudi tudi igranje proti računalniškemu nasprotniku. V ta namen so razvijalci ustvarili algoritem glajenja poti tako, da igralcem nudijo karseda realističen izziv. Ta algoritem bomo v naslednjem delu besedila vzeli pod drobnogled in ga nato tudi uporabili pri našem problemu.
+
+Pot vozila na začetku predstavlja nabor točk, ki tvorijo središčnico znotraj proge. Točke predstavimo kot masne točke, ki so med seboj povezane s torzijskimi vzmetmi.
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=3cm]{pic/slika5.png}
+	\caption{Tri vozlišča poti. Kot $\theta$ povzorča moment \cite{VAS}.}
+	\label{fig:slika}
+\end{figure}
+
+Tak sistem bo s časom silil v stanje minimalne energije v torzijskih vzmeteh in nam posledično ustvaril pot z manjšo ukrivljenostjo.
+
+Silo, ki deluje na maso $m_2$ je možno izračunati na podlagi relativnih leg sosednjih mas. Začnimo s sklepom, da s povečanjem kota $\theta$ dobimo moment sorazmeren kotu.
+\begin{equation}
+\mathbf{N_2} = \mathbf{r}_{23} \times \mathbf{F_3} = -k \theta \hat{n}
+\end{equation}
+Pri tem je $\mathbf{r}_{23}$ vektor od $m_2$ do $m_3$ in $\hat{n}$ je enotski vektor, ki kaže v smeri $\mathbf{r}_{23} \times \mathbf{r}_{21}$. Sila na $m_3$ je tako:
+\begin{equation}
+\mathbf{F_3} = -\frac{k}{|\mathbf{r}_{23}|}\theta(\hat{n} \times \mathbf{r}_{23})
+\end{equation}
+Produkt $\theta \hat{n}$ se izračuna kot vektorski produkt $\mathbf{r}_{23}$ in $\mathbf{r}_{21}$.
+\begin{equation}
+\mathbf{r}_{23} \times \mathbf{r}_{21} = |\mathbf{r}_{23}||\mathbf{r}_{21}| \sin(\phi - \theta) \hat{n}
+\end{equation}
+\begin{equation}
+\sin\theta\hat{n} = |\mathbf{r}_{23}||\mathbf{r}_{21}|\sin\theta\hat{n}
+\end{equation}
+\begin{equation}
+\sin\theta\hat{n} = \frac{\mathbf{r}_{23} \times \mathbf{r}_{21}}{|\mathbf{r}_{23}||\mathbf{r}_{21}|}
+\end{equation}
+\begin{equation}
+\sin\theta\hat{n} = \hat{r}_{23} \times \hat{r}_{21}
+\end{equation}
+Ker pričakujemo majhne kote med vozlišči lahko $\sin\theta$ zapišemo kot $\theta$.
+\begin{equation}
+\theta\hat{n} = \hat{r}_{23} \times \hat{r}_{21}
+\end{equation}
+Z vstavljanjem v enačbo $(2)$ dobimo:
+\begin{equation}
+\mathbf{F}_3 = \frac{k}{|\mathbf{r}_{23}|}(\hat{r}_{23} \times \hat{r}_{21}) \times \hat{r}_{23}
+\end{equation}
+Upoštevajoč simetrijo ugotovimo, da je $\mathbf{F}_1 = \mathbf{F}_3$ in $\mathbf{F}_2 = -2\mathbf{F}_3$ pri majhnem kotu. Definiramo lahko vektor urkivljenosti $\mathbf{c}$ pri $m_3$:
+\begin{equation}
+\mathbf{c} = \hat{n}/R = \theta \hat{n} / |\mathbf{r}_{23}|
+\end{equation}
+Kjer je $R$ radij ukrivljenosti. Kot $\theta$ je kot med $m_2$ in $m_3$ od centra ukrivljenosti.
+
+Enačbo lahko zapišemo kot:
+\begin{equation}
+\mathbf{F}_3 = -k \mathbf{c} \times \hat{r}_{23}
+\end{equation}
+Velikost vekotrja ukrivljenosti bomo uporabili kot največjo hitrost vozila v dani točki na stezi.
+
+Sile so izračunane za vsak povezan trojček n točk. Pri tem omejimo gibanje točk v vse smeri in namesto tega dovolimo le pomik prečno na pot. Ta omejitev nam omogoča večjo stabilnost, posledično pa lahko uporabljamo večje togostne koeficiente vzmeti in tako dobimo hitrejšo konvergenco.
+
+Ko je izračunana skupna sila na vsakemu vozlišču lahko izračunamo novo lego točke z uporabo Newtonov-ovih zakonov gibanja ter z Euler-jevo metodo.
+\begin{equation}
+v_{i + 1} = v_i + (F/m - cv_{i})\Delta t
+\end{equation}
+\begin{equation}
+r_{i + 1} = r_{i} + v_{i + 1} \Delta t 
+\end{equation}
+Z iteriranjem algoritma se lega zglajenega nabora točk stabilizira. Pri tem se je potrebno zavedati, da je pot lahko groba v ostrih ovinkih.
+
+Spodnje slike prikazujejo delovanje dejanskega algoritma glajenja. Leva slika prikazuje graf niza točk nad katerimi bomo  izvajali glajenje. Slika v sredini prikazuje tvorbo proge v okolici omenjenih točk. Proga je ključna za glajenje poti, saj določa območje v kateremu ga izvajamo. Zunanji in notranji del proge tvorijo točke, ki ležijo na premicah, ki so pravokotne na pot. Tukaj 
+moramo biti pozorni na širino proge v ostrih zavojih saj se omenjene premice lahko medsebojno sekajo, kar vodi do težav. Na desni sliki pa vidimo niz točk v novi legi.
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=15cm]{pic/slika6.png}
+	\caption{Postopek glajenja.}
+	\label{fig:slika}
+\end{figure}
+
 
 
 \end{document}

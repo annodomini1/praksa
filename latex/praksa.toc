@@ -6,3 +6,4 @@
 \contentsline {subsection}{\numberline {2.3}Opis problema}{3}
 \contentsline {section}{\numberline {3}Namen in cilji}{3}
 \contentsline {section}{\numberline {4}Pregled mo\IeC {\v z}nih re\IeC {\v s}itev}{4}
+\contentsline {section}{\numberline {5}Algoritem glajenja poti - Vamos}{4}
