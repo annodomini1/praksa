@@ -1,0 +1,8 @@
+\select@language {slovene}
+\contentsline {section}{\numberline {1}Uvod}{2}
+\contentsline {section}{\numberline {2}Ozadje problema}{2}
+\contentsline {subsection}{\numberline {2.1}Zgradba avtonomnega vozila}{2}
+\contentsline {subsection}{\numberline {2.2}Robot Operating System}{2}
+\contentsline {subsection}{\numberline {2.3}Opis problema}{3}
+\contentsline {section}{\numberline {3}Namen in cilji}{3}
+\contentsline {section}{\numberline {4}Pregled mo\IeC {\v z}nih re\IeC {\v s}itev}{4}

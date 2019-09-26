@@ -1,0 +1,245 @@
+\documentclass[final,5p,times,twocolumn]{elsarticle}
+
+\usepackage[utf8]{inputenc}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage[slovene]{babel}
+\usepackage{amsmath}
+
+\makeatletter
+
+\renewenvironment{abstract}{\global\setbox\absbox=\vbox\bgroup
+  \hsize=\textwidth\def\baselinestretch{1}%
+  \noindent\unskip\textbf{Povzetek}
+ \par\medskip\noindent\unskip\ignorespaces}
+ {\egroup}
+
+\def\keyword{%
+  \def\sep{\unskip, }%
+ \def\MSC{\@ifnextchar[{\@MSC}{\@MSC[2000]}}
+  \def\@MSC[##1]{\par\leavevmode\hbox {\it ##1~MSC:\space}}%
+  \def\PACS{\par\leavevmode\hbox {\it PACS:\space}}%
+  \def\JEL{\par\leavevmode\hbox {\it JEL:\space}}%
+  \global\setbox\keybox=\vbox\bgroup\hsize=\textwidth
+  \normalsize\normalfont\def\baselinestretch{1}
+  \parskip\z@
+  \noindent\textit{Ključne besede:}
+  \raggedright                         % Keywords are not justified.
+  \ignorespaces}
+
+\def\ps@pprintTitle{%
+     \let\@oddhead\@empty
+     \let\@evenhead\@empty
+     \def\@oddfoot{\footnotesize\itshape
+       \ifx\@journal\@empty  % <--- Edit as necessary
+       \else\@journal\fi\hfill\today}%
+     \let\@evenfoot\@oddfoot}
+
+\makeatother
+
+
+\usepackage{hyperref}
+\journal{Zbornik seminarjev 2018/19}
+\bibliographystyle{elsarticle-num}
+
+\begin{document}
+
+\begin{frontmatter}
+
+\title{Glajenje poti za avtomatsko vodena vozila}
+
+\author[fs]{Marsel Rus}
+\ead{rus.marsel@mail.net}
+
+\author[fs]{Martin Knap}
+\ead{lojzek_s_hriba@mail.si}
+
+\author[fs]{Rok Vrabič}
+\ead{mentor1@fs.uni-lj.si}
+
+%\author[fs]{Mentor2}
+%\ead{mentor2@fs.uni-lj.si}
+
+\address[fs]{Univerza v Ljubljani, Fakulteta za strojništvo}
+
+\begin{abstract}
+Pri razvoju vozil na področju robotike se pogosto srečujemo s problemom tvorjenja gladke, energijsko učinkovitejše poti, namenjene navigaciji vozila. V tem delu preučimo možne rešitve ter eno od teh apliciramo na avtonomnem vozilu v razvoju. Rešitev problema najdemo na področju motornih športov, kjer se vozniki močno poslužujejo tehnike dirkalne linije za učinkovitejšo vožnjo preko zavojev. Same metode tvorbe dirkalne linije nudijo dirkalni simulatorji, kjer je uporabljena kot trajektorija AI vozil. 
+\end{abstract}
+
+\begin{keyword}
+ROS, Glajenje poti\sep Dirkalna linija\sep Avtonomno vozilo\sep Robotika\sep Navigacija robota
+\end{keyword}
+
+\end{frontmatter}
+
+\section{Uvod}
+%opis problema, definicja problema, rview literature, vamos, ros, metoda rešitve, kako sva reševala(simulator), diskusija
+%podpoglavje:\subsection{Podpoglavje}
+%zakaj v epilogu ne morjo dobit mape z višjo resolucijo?
+
+Pri razvoju avtonomnega vozila, namenjenega razvozu materiala po proizvodnih prostorih, smo se soočili s problemom pri gibanju vozila. Problem se pojavi pri ubiranju poti, ki jo tvori navigacijski algoritem vozila. Ta pot vodi vozilo tako, da se le-to giblje energijsko neučinkovito ter sunkovito. Posledice takšne, grobo tvorjene poti se odražajo v hitrejšem praznenju baterij. To pomeni, da je potrebno baterije vozila večkrat polniti, ter da je vozilo manj časa razpoložljivo. Problem predstavlja tudi potencialno nevarnost, da vozilo zaradi sunkovitih gibov izgubi svoj tovor.
+
+Naša naloga je bila izboljšanje poti, ki jo tvori navigacijski algoritem in posledično omogočiti vozilu, da bo delovalo energijsko učinkovitejše, zanesljivejše, ter da bo vozilo na razpolago daljše časovno obdobje.
+
+\section{Definicija problema}
+
+Problem torej izvira iz poti, ki jo ustvari navigacijski algoritem vozila. Preden se lotimo podrobnejše obravnave izvora težav, bi bilo smotrno predstaviti zgradbo avtonomnega vozila. V podpoglavju bomo predstavili tudi način krmiljenja vozila v programskem okolju \textit{Robot Operating System} (ROS).
+
+\subsection{Zgradba avtonomnega vozila}
+
+Obravnavano vozilo je tipičen predstavnik robotov z diferencialnim pogonom koles (\textit{angl.: differential wheeled robot}) (dodaj vir: wiki).
+Roboti te vrste imajo dve pogonski kolesi, pri čemer ima vsako od koles svoj motor. Poleg dveh pogonskih koles pa imajo ponavadi še eno ali več prosto vrtečih se koles za zagotavljanje stabilnosti. Če se pogonski kolesi vrtita z enako hitrostjo se robot giblje v ravni liniji. Zavijanje pa se doseže tako, da se eno od pogonskih koles vrti hitreje od drugega. %dodaj sliko rabotnika
+
+Naše vozilo ima nosilnost x kg, tako in tako moč, hitrost, maso... (dodaj specse, sliko vozila)
+
+\subsection{Robot Operating System}
+Krmiljenje obravnavanega vozila nam omogoča programsko okolje \textit{Robot Operating System} (ROS). ROS ni operacijski sistem v pravem pomenu besede, temveč je le odprtokodno ogrodje za programiranje robotov \cite{quigley2009ros}. Ideja za platformo je ta, da je delitev idej in znanja med razvijalci enostavnejša, še bolj pomembno pa je, da nam je olajšano razvijanje celotne programske infrastrukture pri razvoju robota, saj so to naredili že drugi razvijalci pred nami.
+
+ROS je sestavljen iz krmilnikov, ki so namenjeni branju podatkov iz senzorjev in pošiljanju ukazov aktuatorjem v dobro definiranem formatu. ROS sestavlja tudi velik in rastoči nabor fundamentalnih robotskih algoritmov, ki omogočajo gradnjo zemljevidov, navigacijo po le-teh, interpretacijo podatkov iz senzorjev, planiranju gibanj, manipuliranju predmetov in še mnogo več. Poleg tega nam nudi še celotno računsko infrastrukturo, ki nam omogoča manipuliranje s podatki tako, da povežemo različne komponente kompleksnega robotskega sistema in vključevanje lastnih algoritmov. ROS je že v osnovi porazdeljen in nam omogoča delitev delovne obremenitve med več računalniki brez težav. Nudi nam tudi nabor orodij za vizualizacijo stanja robota (Gazebo, RViz), algoritmov, za odkrivanje napak in za zajemanje senzorskih podatkov. Navsezadnje pa nam širši ekosistem ROS-a nudi obsežen nabor virov, kot je spletna enciklopedija ter forum, kjer se postavljajo vprašanja ter deli znanje.
+
+ROS torej tvori množica programov, ki delujejo istočasno in komunicirajo med sabo tako, da si med sabo pošiljajo sporočila, ki imajo natančno določeno obliko. Smiselna je grafična predstavitev sistema, kjer so programi vozlišča (\textit{node}), robovi pa predstavljajo komunikacijske kanale (\textit{topic}). Za primer si poglejmo spodnjo sliko, kjer imamo vozlišče s katerim pretvarjamo ukaze tipkovnice v sporočila, ki nosijo informacijo o temu kam naj se robot nameni. Ta sporočila se nato po povezavi posreduje do vozlišča simulacijskega okolja Gazebo v kateremu se nahaja testni robot.
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=8cm]{slika2.png}
+	\caption{Primer dveh vozlišč z medsebojno povezavo.}
+	\label{fig:slika}
+\end{figure}
+
+\subsection{Opis problema}
+
+Seznanjeni z okvirnim delovanjem krmilnega okolja avtomatskega vozila se lahko osredotočimo na problem. Navigacija v okolju ROS se izvaja na podlagi dvodimenzionalnih zemljevidov, mrež. Do teh zemljevidov pridemo z uporabo kartografskih algoritmov kot je na primer \textit{Simultaneous localization and mapping} (SLAM). Mrežo okolja robota dobimo na podlagi izhodnih informacij senzorjev in sicer tako, da zaženemo kartografski algoritem in nato ročno ali avtomatsko vodimo robota po okolju tako, da zajamemo celotno okolico. Ko imamo zajeto celotno območje lahko izvozimo mrežo v obliki slike. Kartografske algoritme nam nudi okolje ROS. 
+
+Mreže, ki jih uporabljamo v ROS-u so v obliki rastrske sivinske slike. Črna polja mreže predstavljajo mesta v prostoru kjer so ovire, kjer se robot ne more gibati. Bela polja predstavljajo mesta v prostoru kjer ni ovir in tam se robot v splošnem lahko giblje. Siva polja pa predstavljajo območje, ki ga ne poznamo.
+
+Izvor našega problema leži v ločljivosti zemljevida uporabljenega za navigacijo. Zaradi velikih dimenzij prostorov v katerih bo robot deloval se pojavi omenjeni problem (razloži podrobneje). Posledica uporabe zemljevida z nizko ločljivostjo, velikim korakom mreže je v majhnemu številu točk na podlagi katerih navigacijski algoritem tvori pot vozila. Pot je v temu primeru groba in izrazito robata. Na spodnji sliki levo vidimo pot pri visoki ločljvosti mreže, na desni pa pot pri nizki ločljivosti mreže.
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=9cm]{slika3.png}
+	\caption{Primerjava poti, ki ju tvori navigacijski algoritem.}
+	\label{fig:slika}
+\end{figure}
+Naša naloga je torej najti metodo, ki nam bo omogočala transformacijo nabora točk, ki tvorijo grobo pot v tak nabor točk, ki bodo tvorile zglajeno, energijsko učinkovitejšo pot vozila. V kontekstu okolja ROS bo rešitev izvedena tako, da se bo ustvarilo dodatno vozlišče v katermeu se bo izvajala transformacija. To vozlišče bo bralo sporočila o poti, ki izhajajo iz ustreznega vozlišča navigacijskega algoritma, jih transformirala in pošiljala naslednjemu vozlišču, ki je izvaja sledenje poti.
+
+\section{Pregled možnih rešitev}
+
+Navdih za rešitev problema glajenja poti smo dobili na področju motornih športov. Tam se vozniki dirkalnih vozil izključno poslužujejo načina vožnje skozi ovinke, ki se mu pravi dirkalna linija (\textit{angl.: racing line}). Dirkalna linija je pot preko ovinka, ki vozniku dirkalnika omogoča najkrajši čas proge \cite{Wiki}. Želja je, da je hitrost pri vožnji skozi ovinek karseda konstantna.
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=3cm]{slika4.png}
+	\caption{Dirkalna linija.}
+	\label{fig:slika}
+\end{figure}
+Ideja za dirkalno linijo je ta, da se vozilo oklepa zunanjega roba ovinka pri vstopu v ovinek in se skuša karseda približati notranjemu robu ovinka na njegovem vrhu. Na izhodu iz ovinka pa se vozilo ponovno približa zunanjemu robu. V teoriji je optimalna pot skozi ovinek takšna, ki ima največji radij.
+
+Iskanje najboljše dirkalne linije za dano vozilo, na dani progi je eden od večjih problemov s katerim se srečujejo razvijalci dirkalnih računalniških iger \cite{cardamone2010searching}. Komercialne dirkalne igre se ponavadi zanašajo na dirkalne linije, ki jih zasnujejo ljudje - strokovnjaki s področja dirkanja. Obstajajo pa tudi izjeme, ki se izognejo omenjeni metodi in se problema lotijo na povsem drugačen način. Dober primer je Colin McRae Rally, kjer dirkalno linijo računajo s pomočjo nevronske mreže, ki so jo učili strokovnjaki iz področja motornih športov \cite{cardamone2010searching}. V Microsoft-ovi igri Forza Motorsport 2 s pomočjo tehnik nadzorovanega učenja (\textit{angl.: supervised learning}) učijo AI-je ter z aplikacijo evolucijskega računanja (\textit{angl.: evolutionary computation}) optimirajo njihove dirkalne linije \cite{pfeiffer2004machine}.
+
+Odprtokodne dirkalne igre se ponavadi zanašajo na hevristične pristope, ki tipično združujejo dobro prakso s hevristiko pri generaciji dirkalnih linij. Najuspešnejši primeri takšnih pristopov vključujejo K1999 algoritem \cite{coulom2002reinforcement}, ki ga je razvil Remi Coulom in deluje na podlagi gradientnega spusta (\textit{angl.: gradient descent}) ter Simplix \cite{Simplix}, ki ga je razvil Wolf-Dieter Beelitz za The Open Car Racing Simulator in bazira na preprosti hevristiki. Ostala uspešna primera sta tudi the bot \cite{rars}, ki ga je razvil Jussi Pajala za Robot Auto Racing Simulator (RARS) in je zasnovan na A* algoritmu ter the DougE1 bot za RARS, ki ga je razvil Doug Elenveld, ta pa izkorišča genetski algoritem. Kljub temu, da omenjene rešitve temeljijo na različnih tehnikah je vsem skupno to, da skušajo zmanjšati ukrivlejnost poti vozila skozi ovinek, saj z manjšo ukrivlejnostjo poti vozilo lahko doseže večjo hitrost brez zdrsa.
+
+Zgoraj omenjene metode so sicer zelo impresivne, vendar obstajajo tudi metode, ki upoštevajo dinamski model vozila pri reševanju omenjenega problema in vodijo do še ustreznejših rešitev omenjenega problema. Na drugi strani pa imamo rešitve, ki so malce preprostejše kot je uporaba kubičnih parametričnih Bézier krivulj pri generaciji dirkalne linije \cite{botta2012evolving} in pa edinstvena rešitev, ki jo nudi odprtokodni Vamos Avtomotive Simulator, kjer je za doesganje manjše ukrivlejnosti poti skozi ovinek uporabljena vergia masnih točk, ki jih povezuje torzijska vzmet. Do zglajene poti pridemo tako, da najdemo minimum potencialne energije shranjene v vzmeteh. Pri reševanju našega problema smo se odločili za seldnjo metodo, zato jo bomo v naslednjem poglavju predstavili podrobneje.
+
+\section{Algoritem glajenja poti - Vamos}
+
+Vamos Avtomotive Simulator (VAS) je odprtokodno simulacijsko ogrodje s poudarkom na fizičnemu modeliranju \cite{VAS}. Vamos modelira veliko večino ključnih podsistemov avtomobilov, kot so elementi pogosnkega sklopa in sicer motor, sklopka, menjalnik in diferencial z omejenim zdrsom. Prav tako pa je modelirano tudi obnašanje pnevmatik pri temperaturnih vplivih, vzmetenje avtomobila in aerodinamski učinki na avtomobilih. VAS igralcem nudi tudi igranje proti računalniškem. V ta namen so razvijalci ustvarili algoritem glajenja poti tako, da igralcem nudijo karseda realističen izziv. Ta algoritem bomo v naslednjem delu besedila vzeli pod drobnogled in ga nato tudi uporabili pri našem problemu.
+
+Pot vozila na začetku predstavlja nabor točk, ki tvorijo središčnico znotraj proge. Točke predstavimo kot masne točke, ki so med seboj povezane s torzijskimi vzmetmi.
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=3cm]{slika5.png}
+	\caption{Tri vozlišča poti. Kot $\theta$ povzorča moment \cite{VAS}.}
+	\label{fig:slika}
+\end{figure}
+Tak sistem bo s časom silil v stanje minimalne energije v torzijskih vzmeteh in nam posledično ustvaril pot z manjšo ukrivljenostjo.
+
+Silo, ki deluje na maso $m_2$ je možno izračunati na podlagi relativnih leg sosednjih mas. Začnimo s sklepom, da s povečanjem kota $\theta$ dobimo moment sorazmeren kotu.
+\begin{equation}
+\mathbf{N_2} = \mathbf{r}_{23} \times \mathbf{F_3} = -k \theta \hat{n}
+\end{equation}
+Pri temu je $\mathbf{r}_{23}$ vektor od $m_2$ do $m_3$ in $\hat{n}$ je enotski vektor, ki kaže v smeri $\mathbf{r}_{23} \times \mathbf{r}_{21}$. Sila na $m_3$ je tako:
+\begin{equation}
+\mathbf{F_3} = -\frac{k}{|\mathbf{r}_{23}|}\theta(\hat{n} \times \mathbf{r}_{23})
+\end{equation}
+Produkt $\theta \hat{n}$ se izračuna kot vektorski produkt $\mathbf{r}_{23}$ in $\mathbf{r}_{21}$.
+\begin{equation}
+\mathbf{r}_{23} \times \mathbf{r}_{21} = |\mathbf{r}_{23}||\mathbf{r}_{21}| \sin(\phi - \theta) \hat{n}
+\end{equation}
+\begin{equation}
+\sin\theta\hat{n} = |\mathbf{r}_{23}||\mathbf{r}_{21}|\sin\theta\hat{n}
+\end{equation}
+\begin{equation}
+\sin\theta\hat{n} = \frac{\mathbf{r}_{23} \times \mathbf{r}_{21}}{|\mathbf{r}_{23}||\mathbf{r}_{21}|}
+\end{equation}
+\begin{equation}
+\sin\theta\hat{n} = \hat{r}_{23} \times \hat{r}_{21}
+\end{equation}
+Ker pričakujemo majhne kote med vozlišči lahko $\sin\theta$ zapišemo kot $\theta$.
+\begin{equation}
+\theta\hat{n} = \hat{r}_{23} \times \hat{r}_{21}
+\end{equation}
+Z vstavljanjem v enačbo $(2)$ dobimo:
+\begin{equation}
+\mathbf{F}_3 = \frac{k}{|\mathbf{r}_{23}|}(\hat{r}_{23} \times \hat{r}_{21}) \times \hat{r}_{23}
+\end{equation}
+Upoštevajoč simetrijo ugotovimo, da je $\mathbf{F}_1 = \mathbf{F}_3$ in $\mathbf{F}_2 = -2\mathbf{F}_3$ pri majhnem kotu. Definiramo lahko vektor urkivljenosti $\mathbf{c}$ pri $m_3$:
+\begin{equation}
+\mathbf{c} = \hat{n}/R = \theta \hat{n} / |\mathbf{r}_{23}|
+\end{equation}
+Kjer je $R$ radij ukrivljenosti. Kot $\theta$ je kot med $m_2$ in $m_3$ od centra ukrivljenosti.
+
+Enačbo lahko zapišemo kot:
+\begin{equation}
+\mathbf{F}_3 = -k \mathbf{c} \times \hat{r}_{23}
+\end{equation}
+Velikost vekotrja ukrivljenosti bomo uporabili kot največjo hitrost vozila v dani točki na stezi.
+
+Sile so izračunane za vsak povezan trojček na točk, pri temu omejimo gibanje točk v vse smeri in namesto tega dovolimo le pomik prečno na pot. Ta omejitev nam omogoča večjo stabilnost, posledično pa lahko uporabljamo večje togostne koeficiente vzmeti in tako dobimo hitrejšo konvergenco.
+
+Ko je izračunana skupna sila na vsakemu vozlišču lahko izračunamo novo lego točke z uporabo Newtonov-ovih zakonov giabnja ter z Euler-jevo metodo.
+\begin{equation}
+v_{i + 1} = v_i + (F/m - cv_{i})\Delta t
+\end{equation}
+\begin{equation}
+r_{i + 1} = r_{i} + v_{i + 1} \Delta t 
+\end{equation}
+Z iteriranjem algoritma se lega zglajenega nabora točk stabilizira. Pri tem se je potrebno zavedati, da je pot lahko groba v ostrih ovinkih
+
+Spodnje slike prikazujejo delovanje dejanskega algoritma glajenja. Leva slika prikazuje graf niza točk nad katerimi bomo  izvajali glajenje. Slika v sredini prikazuje tvorbo proge v okolici omenjenih točk. Proga je ključna za glajenje poti, saj določa območje v kateremu ga izvajamo. Zunanji in notranji del proge tvorijo točke, ki ležijo na premicah, ki so pravokotne na pot. Tukaj 
+moramo biti pozorni na širino proge v ostrih zavojih saj se omenjene premice lahko medsebojno sekajo, kar vodi do težav. Na desni sliki pa vidimo niz točk v novi legi.
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=9cm]{slika6.png}
+	\caption{Postopek glajenja.}
+	\label{fig:slika}
+\end{figure}
+
+
+\section{Aplikacija algoritma}
+
+Z znanim algoritmom glajenja sedaj lahko začnemo na reševanju problema. Naloga je torej ustvariti vmesno vozlišče v ROS-u, ki jemlje podatke o obstoječi poti iz navigacijskega algoritma ter jih ustrezno transformira ter pošilja naslednjemu vozlišču, odgovornemu za izvajanje sledenja novo ustvarjeni poti. Preden zančenmo na delu s samim vozliščem pa je potrebno ustvariti okolje kjer naš program lahko preizkusimo.
+
+\subsection{Priprava razvijalnega okolja}
+
+Omenjeno vozilo v razvoju ni bilo lahko razpoložljivo, zato nam na srečo ROS paket nudi povezljivost s simulacijskim okoljem Gazebo. Gazebo je odprtokodno simulacijsko okolje za testiranje robotov, ki nudi dinamske simulacije, 3D prikaz, generacijo poljubnega modela robota in okolja in še marsikaj drugega. Omenjeni program smo uporabljali v kombinaciji z ROS paketom RViz, ki nudi 3D prikaz robota, okolja ter prikaz vseh vrst senzorksih podatkov, kot so na primer točke zajte z laserskim merilnikom razdalje. Še pomembnejše pa je to, da nam RViz prikazuje podatke o poti, ki jo nudi navigacijski algoritem in tako nudi takojšnjo preverbo. Da okolje izpopolnimo potrebujemo še testno vozilo. Uporabili bomo paket, ki ga nudi spletni blog moorerobots \cite{moorerobots}, ta pa vsebuje preprosto vozilo z diferencialnim pogonom. Delali bomo z ROS izvedbo Kinetic Kame na operacijskem sistemu Linux Ubuntu. Z definiranim okoljem sedaj lahko začnemo na razvoju omenjenega vozlišča vokolju ROS.
+
+\subsection{Izdelava vozlišča}
+
+Za navigacijo robota v okolju ROS skrbi t.i. navigacijski sklad, katerega ključno vozlišče se imenuje \verb|/move_base|. To vozlišče na podlagi podane ciljne točke, zemljevida okolice in bližnje okolice zaznane z laserskim merilnikom ustvari globalen načrt oziroma pot ter lokalno pot, katere namen je, da skuša vozilo karseda približati globalni. Glajena bo pot globalnega načrta, ki jo \verb|/move_base| pošilja po komunikacijski povezavi (\textit{topic}) \verb|/move_base/TrajectoryPlannerROS/global_plan|. Sporočila te povezave so tipa \verb|nav_msgs/Path| in nosijo informacijo o legah točk poti ter o orientaciji v ciljni točki.
+
+Algoritem je napisan v programskem jeziku Python in je sestavlejen iz treh funkcij. Naloga prve funkcije je branje obstoječe, grobe poti in tvorjenje izhodnega podatka v obliki 2D niza točk, kjer prvi stolpec predstavlja x koordinate, drugi stolpec pa y koordinate nezglajene poti. Druga funkcija predstavlja jedro programa kjer se nahaja Vamos gladilni algoritem. V tem delu programa se torej izvaja transformacija točk prebranih v prvi funkciji. Ta funkcija vsebuje tudi vplivne parametre glajenja kot so masa točke, togostni koeficient, število iteracij algoritma ter širina proge na podlagi katere se izvaja glajenje. Izhodni podatek je ponovno 2D niz točk le, da so te transformirane. V tretji funkciji se izvaja prepis zglajenega niza točk v sporočila oblike \verb|nav_msgs/Path| ter njihovo oglaševanje po komunikacijskem kanalu \verb|/vamos|. Na ta kanal se nato poveže vozlišče odgovorno za vodenje robota po globalni poti.
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=8.9cm]{slika7.png}
+	\caption{Grafičen prikaz povezav.}
+	\label{fig:slika}
+\end{figure}
+Vozlišče med drugim koristi tudi ROS-ov paket Dynamic Reconfigure, ki omogoča spreminjanje parametrov vozlišča tekom njegovega obratovanja. Z omenjenim paketom nudimo manipulacijo parametrov omenjenih v drugi funkciji programa.
+
+\section{Diskusija}
+
+
+
+
+
+
+\bibliography{reference}
+
+\end{document}

@@ -1,0 +1,56 @@
+\begin{thebibliography}{10}
+\expandafter\ifx\csname url\endcsname\relax
+  \def\url#1{\texttt{#1}}\fi
+\expandafter\ifx\csname urlprefix\endcsname\relax\def\urlprefix{URL }\fi
+\expandafter\ifx\csname href\endcsname\relax
+  \def\href#1#2{#2} \def\path#1{#1}\fi
+
+\bibitem{difrobots}
+t.~f.~e. Wikipedia,
+  \href{https://en.wikipedia.org/wiki/Differential_wheeled_robot}{Differential
+  wheeled robot}.
+\newline\urlprefix\url{https://en.wikipedia.org/wiki/Differential_wheeled_robot}
+
+\bibitem{Wiki}
+t.~f.~e. Wikipedia, \href{https://en.wikipedia.org/wiki/Racing_line}{Racing
+  line}.
+\newline\urlprefix\url{https://en.wikipedia.org/wiki/Racing_line}
+
+\bibitem{cardamone2010searching}
+L.~Cardamone, D.~Loiacono, P.~L. Lanzi, A.~P. Bardelli, Searching for the
+  optimal racing line using genetic algorithms, in: Computational Intelligence
+  and Games (CIG), 2010 IEEE Symposium on, IEEE, 2010, pp. 388--394.
+
+\bibitem{pfeiffer2004machine}
+M.~Pfeiffer, Machine learning applications in computer games, {\"O}GAI-Journal
+  23~(3) (2004) 4--7.
+
+\bibitem{coulom2002reinforcement}
+R.~Coulom, Reinforcement learning using neural networks, with applications to
+  motor control, Ph.D. thesis, Institut National Polytechnique de Grenoble-INPG
+  (2002).
+
+\bibitem{Simplix}
+W.-D. Beelitz, \href{http://www.simplix.wdbee-aorp.de/default.aspx}{Simplix}.
+\newline\urlprefix\url{http://www.simplix.wdbee-aorp.de/default.aspx}
+
+\bibitem{rars}
+RARS, \href{http://rars.sourceforge.net/}{Robot auto racing simulator}.
+\newline\urlprefix\url{http://rars.sourceforge.net/}
+
+\bibitem{botta2012evolving}
+M.~Botta, V.~Gautieri, D.~Loiacono, P.~L. Lanzi, Evolving the optimal racing
+  line in a high-end racing game, in: Computational Intelligence and Games
+  (CIG), 2012 IEEE Conference on, IEEE, 2012, pp. 108--115.
+
+\bibitem{VAS}
+S.~Varner,
+  \href{http://vamos.sourceforge.net/computer-controlled-cars.pdf}{Computer-controlled
+  cars in vamos}.
+\newline\urlprefix\url{http://vamos.sourceforge.net/computer-controlled-cars.pdf}
+
+\bibitem{moorerobots}
+moorerobots, \href{http://moorerobots.com/blog}{mybot}.
+\newline\urlprefix\url{http://moorerobots.com/blog}
+
+\end{thebibliography}
