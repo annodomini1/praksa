@@ -9,4 +9,4 @@
 \contentsline {section}{\numberline {5}Izbrana re\IeC {\v s}itev}{4}
 \contentsline {section}{\numberline {6}Aplikacija algoritma}{7}
 \contentsline {subsection}{\numberline {6.1}Priprava razvijalnega okolja}{7}
-\contentsline {subsection}{\numberline {6.2}Izdelava vozli\IeC {\v s}\IeC {\v c}a}{7}
+\contentsline {subsection}{\numberline {6.2}ROS vozli\IeC {\v s}\IeC {\v c}e}{7}

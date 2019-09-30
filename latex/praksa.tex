@@ -90,7 +90,7 @@ ROS torej tvori množica programov, ki delujejo istočasno in komunicirajo med s
 
 \begin{figure}[H]
 	\centering
-	\includegraphics[width=8cm]{pic/ros.png}
+	\includegraphics[width=10cm]{pic/ros.png}
 	\caption{Primer dveh vozlišč z medsebojno povezavo v okolju ROS.}
 	\label{fig:sl1}
 \end{figure}
@@ -107,7 +107,7 @@ Izvor našega problema leži v ločljivosti zemljevida uporabljenega za navigaci
 
 \begin{figure}[H]
 	\centering
-	\includegraphics[width=9cm]{pic/pot.png}
+	\includegraphics[width=11cm]{pic/pot.png}
 	\caption{Primerjava poti, ki ju tvori navigacijski algoritem.}
 	\label{fig:slika}
 \end{figure}
@@ -245,19 +245,22 @@ Spodnje slike prikazujejo delovanje dejanskega algoritma glajenja. Leva slika pr
 
 \section{Aplikacija algoritma}
 
-Z znanim algoritmom glajenja sedaj lahko začnemo z reševanjem problema. Naloga je torej ustvariti vmesno vozlišče v ROS-u, ki jemlje podatke o obstoječi poti iz navigacijskega algoritma ter jih ustrezno transformira ter pošilja naslednjemu vozlišču, odgovornemu za izvajanje sledenja novo ustvarjeni poti. Pri določanju območja glajenja se bo upoštevala tudi prisotnost ovir, zato bo potrebno brati tudi informacije o zemljevidu vrednosti (\textit{costmap}). Preden zančenmo na delu s samim vozliščem pa je potrebno ustvariti okolje kjer naš program lahko preizkusimo.
+Z znanim algoritmom glajenja smo lahko pričeli na reševanju problema. Naloga je torej ustvariti vmesno vozlišče v ROS-u, ki jemlje podatke o obstoječi poti iz navigacijskega algoritma ter jih ustrezno transformira ter pošilja naslednjemu vozlišču, ki je odgovoren za izvajanje sledenja novo ustvarjeni poti. Pri določanju območja glajenja se bo upoštevala tudi prisotnost ovir, zato bo potrebno brati tudi informacije o zemljevidu vrednosti (\textit{costmap}). Preden zančenmo na delu s samim vozliščem pa je potrebno ustvariti okolje kjer naš program lahko preizkusimo.
 
 \subsection{Priprava razvijalnega okolja}
 
-Omenjeno vozilo v razvoju ni bilo lahko razpoložljivo, zato nam na srečo ROS paket nudi povezljivost s simulacijskim okoljem Gazebo. Gazebo je odprtokodno simulacijsko okolje za testiranje robotov, ki nudi dinamske simulacije, 3D prikaz, generacijo poljubnega modela robota in okolja in še marsikaj drugega. Omenjeni program smo uporabljali v kombinaciji z ROS paketom RViz, ki nudi 3D prikaz robota, okolja ter prikaz vseh vrst senzorksih podatkov, kot so na primer točke zajete z laserskim merilnikom razdalje. Še pomembnejše pa je to, da nam RViz prikazuje podatke o poti, ki jo nudi navigacijski algoritem in tako nudi takojšnjo preverbo. Da okolje izpopolnimo, potrebujemo še testno vozilo. Uporabili bomo paket, ki ga nudi spletni blog moorerobots \cite{moorerobots}, ta pa vsebuje preprosto vozilo z diferencialnim pogonom. Delali bomo z ROS izvedbo Kinetic Kame na operacijskem sistemu Linux Ubuntu. Z definiranim okoljem sedaj lahko začnemo na razvoju omenjenega vozlišča vokolju ROS.
+Omenjeno vozilo v razvoju ni bilo lahko razpoložljivo, zato nam na srečo ROS paket nudi povezljivost s simulacijskim okoljem Gazebo. Gazebo je odprtokodno simulacijsko okolje za testiranje robotov, ki nudi dinamske simulacije, 3D prikaz, generacijo poljubnega modela robota in okolja in še marsikaj drugega. Omenjeni program smo uporabljali v kombinaciji z ROS paketom RViz, ki nudi 3D prikaz robota, okolja ter prikaz vseh vrst senzorksih podatkov, kot so na primer točke zajete z laserskim merilnikom razdalje. V bistvu nam prikazuje kaj robot vidi. Najpomembnejše je to, da nam RViz prikazuje podatke o poti, ki jo nudi navigacijski algoritem in tako nudi takojšnjo preverbo. Da okolje izpopolnimo, potrebujemo še testno vozilo. Uporabili bomo paket, ki ga nudi spletni blog moorerobots \cite{moorerobots}, ta vsebuje preprosto vozilo z diferencialnim pogonom ter prirejeno realizacijo navgiacijskega algoritma. Delali bomo z ROS izvedbo Kinetic Kame na operacijskem sistemu Linux Ubuntu. Z definiranim okoljem sedaj lahko začnemo na razvoju omenjenega vozlišča vokolju ROS.
 
-\subsection{Izdelava vozlišča}
+\subsection{ROS vozlišče}
 
+\begin{comment}
 Za navigacijo robota v okolju ROS skrbi t.i. navigacijski sklad, katerega ključno vozlišče se imenuje \verb|/move_base|. To vozlišče na podlagi podane ciljne točke, zemljevida okolice in bližnje okolice zaznane z laserskim merilnikom ustvari globalen načrt oziroma pot ter lokalno pot, katere namen je, da skuša vozilo karseda približati globalni. Glajena bo pot globalnega načrta, ki jo \verb|/move_base| pošilja po komunikacijski povezavi (\textit{topic}) \verb|/move_base/TrajectoryPlannerROS/global_plan|. Sporočila te povezave so tipa \verb|nav_msgs/Path| in nosijo informacijo o legah točk poti ter o orientaciji v ciljni točki. Ker se pri določanju območja glajenja upošteva tudi prisotnost ovir oziroma zemljevid vrednosti je potrebno brati tudi sporočila tipa \verb|nav_msgs/OccupancyGrid|, ki jih navigacijski sklad pošilja po povezavi \verb|/move_base/global_costmap/costmap|.
 
 Algoritem je napisan v programskem jeziku Python in je v grobem sestavljen iz petih funkcij. Naloga prve funkcije je branje obstoječe, grobe poti in tvorjenje izhodnega podatka v obliki 2D niza točk, kjer prvi stolpec predstavlja x koordinate, drugi stolpec pa y koordinate nezglajene poti. Naloga druge funkcije je dodajanje vmesnih točk med točke nezglajene poti, saj je groba pot sestavljena iz malega števila točk. Tako omogočimo, da se postopek glajenja izvaja nad večjim številom točk, kar še dodatno pripomore k tvorbi ustreznejše poti. Tretja funkcija bere zemljevid vrednosti in informacijo o zemljevidu pretvarja v matriko čitljive oblike, kjer lega posameznega elementa sovpada s točko kartografiranega prostora. V tretji funkciji se določa širina območja glajenja in sicer tako, da se inkrementalno povečuje leva in desna meja območja nakar se za vsak inkrement širine preveri, če katera od koordinat leve in desne meje leži v območju ovire. To se izvede tako, da se koordinate leve in desne meje območja glajenja prevede v pripadajoče elemente matrike vrednosti in preveri, če je pripadajoča vrednost pod mejo. Ko z inkrementiranjem dosežemo oviro je prag sprejemljive vrednosti presežen in inkrementiranje se zaključi, s tem pa določimo širino območja glajenja. Širina območja inkrementalnega povečevanja širine je omejeno, saj bi se v okolici brez ovir inkrementiranje izvajalo, do roba zemljevida. Postopek se izvajala ločeno za levo in desno mejo.
 
 Četrta funkcija predstavlja jedro programa kjer se nahaja Vamos gladilni algoritem. V tem delu programa se torej izvaja transformacija točk prebranih iz druge funkcije. Ta funkcija vsebuje tudi vplivne parametre glajenja kot so masa točke, togostni koeficient, število iteracij algoritma ter širina proge, ki se jo določi v tretji funkciji. Izhodni podatek je ponovno 2D niz točk, le da so te transformirane. V tretji funkciji se izvaja prepis zglajenega niza točk v sporočila oblike \verb|nav_msgs/Path| ter njihovo oglaševanje po komunikacijskem kanalu \verb|/vamos|. Na ta kanal se nato poveže vozlišče odgovorno za vodenje robota po globalni poti.
+\end{comment}
+
 \begin{comment}
 \begin{figure}[H]
 	\centering
@@ -266,7 +269,12 @@ Algoritem je napisan v programskem jeziku Python in je v grobem sestavljen iz pe
 	\label{fig:slika}
 \end{figure}
 \end{comment}
+
+\begin{comment}
 Vozlišče med drugim koristi tudi ROS-ov paket Dynamic Reconfigure, ki omogoča spreminjanje parametrov vozlišča tekom njegovega obratovanja. Z omenjenim paketom nudimo manipulacijo nad parametri v drugi, treji in četrti funkciji.
+\end{comment}
+
+
 
 
 

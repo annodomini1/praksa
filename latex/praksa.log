@@ -1,11 +1,11 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.16 (TeX Live 2015/Debian) (preloaded format=pdflatex 2019.9.26)  27 SEP 2019 14:40
+This is pdfTeX, Version 3.14159265-2.6-1.40.16 (TeX Live 2015/Debian) (preloaded format=pdflatex 2019.5.21)  30 SEP 2019 13:31
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
 **praksa.tex
 (./praksa.tex
 LaTeX2e <2016/02/01>
-Babel <3.9q> and hyphenation patterns for 81 language(s) loaded.
+Babel <3.9q> and hyphenation patterns for 31 language(s) loaded.
 (/usr/share/texlive/texmf-dist/tex/latex/base/article.cls
 Document Class: article 2014/09/29 v1.4h Standard LaTeX document class
 (/usr/share/texlive/texmf-dist/tex/latex/base/size10.clo
@@ -633,7 +633,7 @@ LaTeX Warning: Citation `VAS' on page 1 undefined on input line 5.
 File: pic/ros.png Graphic file (type png)
  <use pic/ros.png>
 Package pdftex.def Info: pic/ros.png used on input line 93.
-(pdftex.def)             Requested size: 227.62204pt x 32.4959pt.
+(pdftex.def)             Requested size: 284.52756pt x 40.62361pt.
  [2
 
 ]
@@ -641,7 +641,7 @@ Package pdftex.def Info: pic/ros.png used on input line 93.
 File: pic/pot.png Graphic file (type png)
  <use pic/pot.png>
 Package pdftex.def Info: pic/pot.png used on input line 110.
-(pdftex.def)             Requested size: 256.0748pt x 129.46591pt.
+(pdftex.def)             Requested size: 312.9803pt x 158.2434pt.
  [3 <./pic/ros.png> <./pic/pot.png>] <pic/slika4.png, id=24, 316.18124pt x 326.
 21875pt>
 File: pic/slika4.png Graphic file (type png)
@@ -676,7 +676,7 @@ Package pdftex.def Info: pic/slika6.png used on input line 241.
 
 LaTeX Warning: Citation `moorerobots' on page 7 undefined on input line 252.
 
-[7] [8] (./praksa.aux)
+[7] (./praksa.aux)
 
 LaTeX Warning: There were undefined references.
 
@@ -685,13 +685,13 @@ LaTeX Warning: There were multiply-defined labels.
 
  ) 
 Here is how much of TeX's memory you used:
- 4450 strings out of 493029
- 63301 string characters out of 6136234
- 141268 words of memory out of 5000000
- 7905 multiletter control sequences out of 15000+600000
+ 4450 strings out of 494333
+ 63301 string characters out of 6163939
+ 136928 words of memory out of 5000000
+ 7697 multiletter control sequences out of 15000+600000
  6745 words of font info for 25 fonts, out of 8000000 for 9000
- 1141 hyphenation exceptions out of 8191
- 44i,5n,42p,1521b,300s stack positions out of 5000i,500n,10000p,200000b,80000s
+ 372 hyphenation exceptions out of 8191
+ 44i,5n,42p,1515b,300s stack positions out of 5000i,500n,10000p,200000b,80000s
 </usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx10.pfb></us
 r/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx12.pfb></usr/shar
 e/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx7.pfb></usr/share/texli
@@ -703,10 +703,10 @@ ublic/amsfonts/cm/cmr7.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/am
 sfonts/cm/cmsy10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts
 /cm/cmti10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cm
 tt10.pfb>
-Output written on praksa.pdf (9 pages, 484497 bytes).
+Output written on praksa.pdf (8 pages, 480106 bytes).
 PDF statistics:
- 87 PDF objects out of 1000 (max. 8388607)
- 56 compressed objects within 1 object stream
+ 84 PDF objects out of 1000 (max. 8388607)
+ 54 compressed objects within 1 object stream
  0 named destinations out of 1000 (max. 500000)
  26 words of extra memory for PDF output out of 10000 (max. 10000000)
 
