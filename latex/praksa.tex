@@ -103,7 +103,7 @@ Do teh zemljevidov pridemo z uporabo kartografskih algoritmov kot je na primer \
 
 Mreže, ki jih uporabljamo v ROS-u so v obliki rastrske sivinske slike. Črna polja mreže predstavljajo mesta v prostoru kjer so ovire, kjer se robot ne more gibati. Bela polja predstavljajo mesta v prostoru kjer ni ovir in tam se robot v splošnem lahko giblje. Siva polja pa predstavljajo območje, ki ga ne poznamo.
 
-Izvor našega problema leži v ločljivosti zemljevida uporabljenega za navigacijo. Zaradi velikih dimenzij prostorov v katerih bo robot deloval se pojavi potreba po grobih zemljevidih, saj se tako prihrani računski čas ter prostor v računalniškem spominu. Posledica uporabe zemljevida z nizko ločljivostjo, velikim korakom mreže je v majhnemu številu točk na podlagi katerih navigacijski algoritem tvori pot vozila. Pot je v temu primeru groba in izrazito robata. Na spodnji sliki vidimo z modro obarvano idelano pot, z rdečo pa je obarvna pot določena na podlagi zemljevida vrednosti pri dveh različnih ločljivostih. Z neskončno majhno diskretizacijo prostora, bi rdeča in modra pot sovpadali.
+Izvor našega problema leži v ločljivosti zemljevida uporabljenega za navigacijo. Zaradi velikih dimenzij prostorov v katerih bo robot deloval se pojavi potreba po grobih zemljevidih, saj se tako prihrani računski čas ter prostor v računalniškem spominu. Posledica uporabe zemljevida z nizko ločljivostjo, velikim korakom mreže je v majhnemu številu točk na podlagi katerih navigacijski algoritem tvori pot vozila. Pot je v temu primeru groba in izrazito robata. Na spodnji sliki vidimo z modro obarvano idelano pot, z rdečo pa je obarvna pot določena na podlagi zemljevida vrednosti pri dveh različnih ločljivostih. V idealnem primeru bi z neskončno majhno diskretizacijo prostora rdeča in modra pot sovpadali.
 
 \begin{figure}[H]
 	\centering
@@ -253,9 +253,40 @@ Omenjeno vozilo v razvoju ni bilo lahko razpoložljivo, zato nam na srečo ROS p
 
 \subsection{ROS vozlišče}
 
-\begin{comment}
-Za navigacijo robota v okolju ROS skrbi t.i. navigacijski sklad, katerega ključno vozlišče se imenuje \verb|/move_base|. To vozlišče na podlagi podane ciljne točke, zemljevida okolice in bližnje okolice zaznane z laserskim merilnikom ustvari globalen načrt oziroma pot ter lokalno pot, katere namen je, da skuša vozilo karseda približati globalni. Glajena bo pot globalnega načrta, ki jo \verb|/move_base| pošilja po komunikacijski povezavi (\textit{topic}) \verb|/move_base/TrajectoryPlannerROS/global_plan|. Sporočila te povezave so tipa \verb|nav_msgs/Path| in nosijo informacijo o legah točk poti ter o orientaciji v ciljni točki. Ker se pri določanju območja glajenja upošteva tudi prisotnost ovir oziroma zemljevid vrednosti je potrebno brati tudi sporočila tipa \verb|nav_msgs/OccupancyGrid|, ki jih navigacijski sklad pošilja po povezavi \verb|/move_base/global_costmap/costmap|.
+\subsubsection{Pomembnejše povezave vozlišča}
 
+
+Za navigacijo robota v okolju ROS skrbi t.i. navigacijski sklad (ang.: \textit{navigation stack}), katerega vozlišče se imenuje \verb|/move_base|. To vozlišče na podlagi podane ciljne točke, zemljevida okolice in bližnje okolice zaznane z laserskim merilnikom ustvari globalen načrt oziroma pot ter lokalno pot, katere namen je, da skuša vozilo karseda približati globalni. Glajena bo pot globalnega načrta, ki jo \verb|/move_base| pošilja po komunikacijski povezavi (\textit{topic}) \verb|/move_base/TrajectoryPlannerROS/global_plan|. Sporočila te povezave so tipa \verb|nav_msgs/Path| in nosijo informacijo o legah točk poti ter o orientaciji v ciljni točki. Ker se pri določanju območja glajenja upošteva tudi prisotnost ovir oziroma zemljevid vrednosti je potrebno brati tudi sporočila tipa \verb|nav_msgs/OccupancyGrid|, ki jih navigacijski sklad pošilja po povezavi \verb|/move_base/global_costmap/costmap|. Lega ovri se s časom lahko spreminja zato se tudi zemljevid vrednosti s časom spremija in posledično je potrebno njegovo informacijo dopolnjevati s sporočila tipa \verb|map_msgs/OccupancyGridUpdate|, ki jih dobimo preko kanala
+\verb|/move_base/global_costmap/costmap_updates|.
+
+\subsubsection{Delovanje vozlišča}
+
+Vozlišče je zasnovano tako, da ima zavoljo enostavnosti uporabe avtomatizirano nastavljanje pramaterov ob njegovem zagonu. Ideja je realizirana tako, da vozlišče deluje kot avtomat z dvemi stanji. Naloga prvega stanja je nastavitev prametrov, naloga drugega pa je glajenje poti po tem ko so paramteri glajenja ugotovljeni.
+
+\subsubsection{Iskanje parametrov}
+
+Iskanje paramterov je izvedeno tako, da se ob zagonu vozlišča glajenja, ki smo ga poimenovali \verb|/path_smoothing_node| vozlišču \verb|/move_base| pošilja naključne cilje z ozirom na zemljevid vrednosti (če je cilj podan na mesto ovire nam navigacijski sklad ne ustvari poti). Namen tega je pridobitev ustrezno grobe poti na podlagi katere laho izvedemo optimizacijo s katero lahko določimo optimalne parametre. Ustreznost poti na kateri temelji optimizacija ocenimo na podlagi srednje vrednosti in standardne deviacije absolutne vrednosti kotov med posameznimi daljicami, ki tvorijo grobo pot.
+
+Ko je ustrezna pot najdena začenmo z iskanjem minimuma kriterijske funkcije, ki je definirana kot srednja vrednost absolutnih kotov med odseki poti. Metoda iskanja ekstrema je Nelder-Mead, ki deluje na sledeč način. Pri tej metodi iščemo ekstrem funkcije z uporabo t.i. simplexa. To je $n+1$ dimenzionalen enakostraničen politop v $n$ parametrskem prostoru (slika \ref{fig:slika6}, primer a). V našem primeru optimiramo dva paramtera (masa in dušenje) zato je simplex trodimenzionalen.
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=10cm]{pic/simplex.png}
+	\caption{Simplex (dodaj vir).}
+	\label{fig:slika6}
+\end{figure}
+
+Prvi korak iskanja minimuma funkcije s simplexom je tvorba simplexa na podlagi začetnih približkov. Nato se najde točko na simplexu, ki vrne največjo vrednost kriterijske funkcije. To točko se nato preslika preko lika tako, da tvorimo nov simplex (\ref{fig:slika6}, primer b). Postopek ponavljamo toliko časa, dokler ne konvergiramo v okolico lokalnega minimuma.
+
+Prednost metode je v tem, da ne potrebujemo matematično definirane kriterijske funckije (lahko je funkcija v programskem smislu) in posledičnega odvoda, ki ga za razliko od te metode potrebujejo gradientne metode.
+
+V našem primeru smo uporabili več začenih približkov z namenom bolj globalnega preiskovanja kriterijske funckije. Ko so z omenjenim pristopom najedni optimalni paramteri jih lahko uporabimo v naslednjem stanju avtomata, ki predstavlja jedro vozlišča.
+
+\subsubsection{Glajenje poti}
+
+
+
+\begin{comment}
 Algoritem je napisan v programskem jeziku Python in je v grobem sestavljen iz petih funkcij. Naloga prve funkcije je branje obstoječe, grobe poti in tvorjenje izhodnega podatka v obliki 2D niza točk, kjer prvi stolpec predstavlja x koordinate, drugi stolpec pa y koordinate nezglajene poti. Naloga druge funkcije je dodajanje vmesnih točk med točke nezglajene poti, saj je groba pot sestavljena iz malega števila točk. Tako omogočimo, da se postopek glajenja izvaja nad večjim številom točk, kar še dodatno pripomore k tvorbi ustreznejše poti. Tretja funkcija bere zemljevid vrednosti in informacijo o zemljevidu pretvarja v matriko čitljive oblike, kjer lega posameznega elementa sovpada s točko kartografiranega prostora. V tretji funkciji se določa širina območja glajenja in sicer tako, da se inkrementalno povečuje leva in desna meja območja nakar se za vsak inkrement širine preveri, če katera od koordinat leve in desne meje leži v območju ovire. To se izvede tako, da se koordinate leve in desne meje območja glajenja prevede v pripadajoče elemente matrike vrednosti in preveri, če je pripadajoča vrednost pod mejo. Ko z inkrementiranjem dosežemo oviro je prag sprejemljive vrednosti presežen in inkrementiranje se zaključi, s tem pa določimo širino območja glajenja. Širina območja inkrementalnega povečevanja širine je omejeno, saj bi se v okolici brez ovir inkrementiranje izvajalo, do roba zemljevida. Postopek se izvajala ločeno za levo in desno mejo.
 
 Četrta funkcija predstavlja jedro programa kjer se nahaja Vamos gladilni algoritem. V tem delu programa se torej izvaja transformacija točk prebranih iz druge funkcije. Ta funkcija vsebuje tudi vplivne parametre glajenja kot so masa točke, togostni koeficient, število iteracij algoritma ter širina proge, ki se jo določi v tretji funkciji. Izhodni podatek je ponovno 2D niz točk, le da so te transformirane. V tretji funkciji se izvaja prepis zglajenega niza točk v sporočila oblike \verb|nav_msgs/Path| ter njihovo oglaševanje po komunikacijskem kanalu \verb|/vamos|. Na ta kanal se nato poveže vozlišče odgovorno za vodenje robota po globalni poti.
