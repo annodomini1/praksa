@@ -224,7 +224,7 @@ Iz definicije hitrosti sledi še druga enačba.
 \dot{x} = \frac{x_{i+1} - x_i}{\Delta t}
 \end{equation}
 
-\begin{equation}
+\begin{equation} \label{eq:16}
 x_{i + 1} = x_{i} + \dot{x}_{i + 1} \Delta t 
 \end{equation}
 
@@ -265,9 +265,9 @@ Vozlišče je zasnovano tako, da ima zavoljo enostavnosti uporabe avtomatizirano
 
 \subsubsection{Iskanje parametrov}
 
-Iskanje paramterov je izvedeno tako, da se ob zagonu vozlišča glajenja, ki smo ga poimenovali \verb|/path_smoothing_node| vozlišču \verb|/move_base| pošilja naključne cilje z ozirom na zemljevid vrednosti (če je cilj podan na mesto ovire nam navigacijski sklad ne ustvari poti). Namen tega je pridobitev ustrezno grobe poti na podlagi katere laho izvedemo optimizacijo s katero lahko določimo optimalne parametre. Ustreznost poti na kateri temelji optimizacija ocenimo na podlagi srednje vrednosti in standardne deviacije absolutne vrednosti kotov med posameznimi daljicami, ki tvorijo grobo pot.
+Iskanje paramterov je izvedeno tako, da se ob zagonu vozlišča glajenja, ki smo ga poimenovali \verb|/path_smoothing_node| vozlišču \verb|/move_base| pošilja naključne cilje z ozirom na zemljevid vrednosti (če je cilj podan na mesto ovire nam navigacijski sklad ne ustvari poti). Namen tega je pridobitev ustrezno grobe poti na podlagi katere izvedemo optimizacijo s katero iščemo optimalne parametre. Ustreznost poti na kateri temelji optimizacija ocenimo na podlagi srednje vrednosti in standardne deviacije absolutne vrednosti kotov med posameznimi daljicami, ki tvorijo grobo pot.
 
-Ko je ustrezna pot najdena začenmo z iskanjem minimuma kriterijske funkcije, ki je definirana kot srednja vrednost absolutnih kotov med odseki poti. Metoda iskanja ekstrema je Nelder-Mead, ki deluje na sledeč način. Pri tej metodi iščemo ekstrem funkcije z uporabo t.i. simplexa. To je $n+1$ dimenzionalen enakostraničen politop v $n$ parametrskem prostoru (slika \ref{fig:slika6}, primer a). V našem primeru optimiramo dva paramtera (masa in dušenje) zato je simplex trodimenzionalen.
+Ko je ustrezna pot najdena začenmo z iskanjem minimuma kriterijske funkcije, ki je definirana kot srednja vrednost absolutnih kotov med odseki poti. Metoda iskanja ekstrema je Nelder-Mead, ki deluje na sledeč način. Pri tej metodi iščemo ekstrem funkcije z uporabo t.i. simplexa. To je $n+1$ dimenzionalen enakostraničen politop v $n$ parametrskem prostoru (slika \ref{fig:slika6}, primer a). V našem primeru optimiramo dva paramtera (masa in dušenje) zato je simplex enakostraničen trikotnik.
 
 \begin{figure}[H]
 	\centering
@@ -280,9 +280,33 @@ Prvi korak iskanja minimuma funkcije s simplexom je tvorba simplexa na podlagi z
 
 Prednost metode je v tem, da ne potrebujemo matematično definirane kriterijske funckije (lahko je funkcija v programskem smislu) in posledičnega odvoda, ki ga za razliko od te metode potrebujejo gradientne metode.
 
-V našem primeru smo uporabili več začenih približkov z namenom bolj globalnega preiskovanja kriterijske funckije. Ko so z omenjenim pristopom najedni optimalni paramteri jih lahko uporabimo v naslednjem stanju avtomata, ki predstavlja jedro vozlišča.
+V našem primeru smo uporabili več začenih približkov z namenom bolj globalnega preiskovanja kriterijske funckije. Ko so z omenjenim pristopom najedni optimalni paramteri jih uporabimo v naslednjem stanju avtomata, ki predstavlja jedro vozlišča.
+
+Prvo stanje v vozlišče vnaša nekaj ROS paramterov, ki jih lahko nadziramo s paketom \verb|dynamic_reconfigure|. Te parametri so značilke na podlagi kerih iščemo grobo pot, to so torej srednja vrednost, standardna deviacija absolutnih kotov ter minimalna dolžina poti. Ko je nova pot pridobljena sledi še njena objava.
 
 \subsubsection{Glajenje poti}
+
+Jedro vozlišča, ki ga predstavlja glajenje poti je sestavljeno iz petih ključnih funkcij, ki so realizirane v programskem jeziku Python. Naloga prve funckije je branje obstoječe grobe poti, ki jo vrača navigacijski sklad. Prva funckija vrne grobo pot v urejeni obliki 2D polja točk. To polje točk nato prevzame druga funckija, ki doda vmesne točke kar poveča učinek algoritma glajenja. Na podlagi polja z dodanimi točkami ter zemljevida vrednosti se v tretji funkciji določa območje glajenja. Cilj te funkcije je določiti območje glajenja z ozirom na zemljevid vrednosti, to pa se izvede tako, da se skozi točke poti v pravokotni smeri inkrementalno premikamo vzdolž normale ter preverjamo pripadajoče mesto v zemljevidu vrednosti. Preverjanje zemljevida vrednosti je izvedeno tako, da se točko inkrementiranja na podlagi ločljivosti zemljevida pretvori v element matrike, ki predstavlja realizacijo zemljevida vrednosti in preveri vrednost omenjenega elementa. Ko dosežemo oviro ozrioma mejo inkremetiranja se postopek ustavi, dosežena razdalja pa se doda v polje razdalj od poti do ovire. Postopek se ponavlja za vsako točko poti na levi in desni strani glede na pot, tako dobimo dve polji (levo in desno) razdalj od poti do ovire. Primer območja v oklici poti lahko vidimo na sliki \ref{fig:slika_obm}, kjer rdeči linji predstavljata meji območja, modra linija pa grobo pot. Na sliki \ref{fig:slika_obm} črna polja predstavljajo prisotnost ovire.
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=10cm]{pic/obmocje.png}
+	\caption{Primer dolocanja območja glajenja v programu RViz.}
+	\label{fig:slika_obm}
+\end{figure}
+
+Polje točk grobe poti ter polji, ki tvorita območje galjenja se nato uporabi v funkciji s katero gladimo pot na način, ki je opisan v poglavju 5. Pri tem uporabimo paramtere ugotovljene v prvem stanju algoritma. Ostali paramteri glajenja so število iteracij s katerimi določamo lego po enačbi \ref{eq:16}, korak inkrementalnega preverjanja območja glajenja, meja inkrementiranja ter prag vrednosti ovire v zemljevidu vrednosti. Ko je pot zglajena sledi njena objava v sporočilu oblike \verb|/nav_msgs/Path|, ki vsebuje točke poti ter orientacijo v zadnji točki.
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=16cm]{pic/shema.png}
+	\caption{Shema delovanja algoritma glajenja poti.}
+	\label{fig:slika6}
+\end{figure}
+
+\section{Rezultati}
+
+\section{Zaključek}
 
 
 
