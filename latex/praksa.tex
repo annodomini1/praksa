@@ -22,6 +22,8 @@
 \usepackage{float}
 \usepackage{verbatim}
 
+\usepackage{etoolbox}
+\patchcmd{\thebibliography}{\section*}{\section}{}{}
 
 
 %Literatura
@@ -68,8 +70,8 @@ Problem torej izvira iz poti, ki jo ustvari navigacijski algoritem vozila. Prede
 
 \subsection{Zgradba avtonomnega vozila}
 
-Obravnavano vozilo je tipičen predstavnik robotov z diferencialnim pogonom koles (\textit{angl.: differential wheeled robot}).
-Roboti te vrste imajo dve pogonski kolesi, pri čemer ima vsako od koles svoj motor. Poleg dveh pogonskih koles pa imajo ponavadi še eno ali več prosto vrtečih se koles za zagotavljanje stabilnosti. Če se pogonski kolesi vrtita z enako hitrostjo se robot giblje v ravni liniji. Zavijanje pa se doseže tako, da se eno od pogonskih koles vrti hitreje od drugega. %dodaj sliko rabotnika
+Obravnavano vozilo je tipičen predstavnik robotov z diferencialnim pogonom koles (\textit{Angl.: differential wheeled robot}).
+Roboti te vrste imajo dve pogonski kolesi, pri čemer ima vsako od koles svoj motor. Poleg dveh pogonskih koles pa imajo ponavadi še eno ali več prosto vrtečih se koles za zagotavljanje stabilnosti. Če se pogonski kolesi vrtita z enako hitrostjo se robot giblje v ravni liniji. Zavijanje pa se doseže tako, da se eno od pogonskih koles vrti hitreje od drugega \cite{vir1}. %dodaj sliko rabotnika
 
 %Naše vozilo ima nosilnost x kg, tako in tako moč, hitrost, maso... (dodaj specse, sliko vozila)
 
@@ -82,11 +84,11 @@ Osnovni entiteti ROS-a sta vozlišče (\textit{node}) in komunikacijska povezava
 \end{comment}
 %Poleg tega nam nudi še celotno računsko infrastrukturo, ki nam omogoča manipuliranje s podatki tako, da povežemo različne komponente kompleksnega robotskega sistema in vključevanje lastnih algoritmov.
 %\begin{comment}
-Krmiljenje obravnavanega vozila nam omogoča programsko okolje \textit{Robot Operating System} (ROS). ROS ni operacijski sistem v pravem pomenu besede, temveč je odprtokodno ogrodje za programiranje robotov. Ideja za platformo je ta, da je delitev idej in znanja med razvijalci enostavnejša, še bolj pomembno pa je, da nam je olajšano razvijanje celotne programske infrastrukture pri razvoju robota, saj so to naredili že drugi razvijalci pred nami.
+Krmiljenje obravnavanega vozila nam omogoča programsko okolje \textit{Robot Operating System} - ROS. ROS ni operacijski sistem v pravem pomenu besede, temveč je odprtokodno ogrodje za programiranje robotov. Ideja za platformo je ta, da je delitev idej in znanja med razvijalci enostavnejša, še bolj pomembno pa je, da nam je olajšano razvijanje celotne programske infrastrukture pri razvoju robota, saj so to naredili že drugi razvijalci pred nami.
 
 ROS je sestavljen iz krmilnikov, ki so namenjeni branju podatkov iz senzorjev in pošiljanju ukazov aktuatorjem v dobro definiranem formatu. ROS sestavlja tudi velik in rastoči nabor fundamentalnih robotskih algoritmov, ki omogočajo gradnjo zemljevidov, navigacijo po le-teh, interpretacijo podatkov iz senzorjev, planiranju gibanj, manipuliranju predmetov in še mnogo več. Poleg tega nam nudi še celotno računsko infrastrukturo, ki nam omogoča manipuliranje s podatki tako, da povežemo različne komponente kompleksnega robotskega sistema in vključevanje lastnih algoritmov. ROS je že v osnovi porazdeljen in nam omogoča delitev delovne obremenitve med več računalniki brez težav. Nudi nam tudi nabor orodij za vizualizacijo stanja robota (Gazebo, RViz), algoritmov, za odkrivanje napak in za zajemanje senzorskih podatkov. Navsezadnje pa nam širši ekosistem ROS-a nudi obsežen nabor virov, kot je spletna enciklopedija ter forum, kjer se postavljajo vprašanja ter deli znanje.
 
-ROS torej tvori množica programov, ki delujejo istočasno in komunicirajo med sabo tako, da si med sabo pošiljajo sporočila (\textit{message}), ki imajo natančno določeno obliko. Smiselna je grafična predstavitev sistema, kjer so programi vozlišča (\textit{node}), robovi pa predstavljajo komunikacijske kanale (\textit{topic}). Za primer si poglejmo spodnjo sliko (slika \ref{fig:sl1}), kjer imamo vozlišče \verb|/turtlebot_teleop_keyboard| s katerim pretvarjamo ukaze tipkovnice v sporočila oblike \verb|geometry_msgs/Twist|, ki nosijo informacijo o temu kako naj se robot premika (linearne, kotne hitrosti). Ta sporočila se nato po povezavi \verb|/cmd_vel| posreduje do vozlišča simulacijskega okolja Gazebo z istim imenom v kateremu se nahaja testni robot.
+ROS torej tvori množica programov, ki delujejo istočasno in komunicirajo med sabo tako, da si med seboj pošiljajo sporočila (Angl.: \textit{message}), ki imajo natančno določeno obliko. Smiselna je grafična predstavitev sistema, kjer so programi vozlišča (Angl.: \textit{node}), robovi pa predstavljajo komunikacijske kanale (Angl.: \textit{topic}). Za primer si poglejmo spodnjo sliko (Slika \ref{fig:sl1}), kjer imamo vozlišče \texttt{/turtlebot\_teleop\_keyboard} s katerim pretvarjamo ukaze tipkovnice v sporočila oblike \texttt{geometry\_msgs/Twist}, ki nosijo informacijo o temu kako naj se robot premika (linearne, kotne hitrosti). Ta sporočila se nato po povezavi \texttt{/cmd\_vel} posreduje do vozlišča simulacijskega okolja Gazebo z istim imenom v kateremu se nahaja testni robot. Obstajajo standardna sporočila ter sporočila, ki jih ustvari uporabnik sam.
 
 \begin{figure}[H]
 	\centering
@@ -97,9 +99,9 @@ ROS torej tvori množica programov, ki delujejo istočasno in komunicirajo med s
 
 \subsection{Opis problema}
 
-Seznanjeni z okvirnim delovanjem krmilnega okolja avtomatskega vozila se lahko osredotočimo na problem. Navigacija v okolju ROS se izvaja na podlagi zemljevidov uteži (angl.: \textit{Costmap}). To so dvodimenzionalne mreže pravokotne oblike, kjer so ovire predstavljene z utežmi. Razdelki v zemljevidu uteži imajo tako vrednost 0 v primeru odsotnosti ovire ter vrednosti 100 v primeru ovire.
+Seznanjeni z okvirnim delovanjem krmilnega okolja avtomatskega vozila se lahko osredotočimo na problem. Navigacija v okolju ROS se izvaja na podlagi zemljevidov uteži (Angl.: \textit{Costmap}). To so dvodimenzionalne mreže pravokotne oblike, kjer so ovire predstavljene z utežmi. Razdelki v zemljevidu uteži imajo tako vrednost 0 v primeru odsotnosti ovire ter vrednosti 100 v primeru ovire.
 
-Do teh zemljevidov pridemo z uporabo kartografskih algoritmov kot je na primer \textit{Simultaneous Localization And Mapping} (SLAM). Mrežo okolja robota dobimo na podlagi izhodnih informacij senzorjev in sicer tako, da zaženemo kartografski algoritem in nato ročno ali avtomatsko vodimo robota po okolju tako, da zajamemo celotno okolico. Ko imamo zajeto celotno območje lahko izvozimo mrežo v obliki slike. Kartografske algoritme nam nudi okolje ROS. 
+Do teh zemljevidov pridemo z uporabo kartografskih algoritmov kot je na primer \textit{Simultaneous Localization And Mapping} - SLAM. Mrežo okolja robota dobimo na podlagi izhodnih informacij senzorjev in sicer tako, da zaženemo kartografski algoritem in nato ročno ali avtomatsko vodimo robota po okolju tako, da zajamemo celotno okolico. Ko imamo zajeto celotno območje lahko izvozimo mrežo v obliki slike. Kartografske algoritme nam nudi okolje ROS. 
 
 Mreže, ki jih uporabljamo v ROS-u so v obliki rastrske sivinske slike. Črna polja mreže predstavljajo mesta v prostoru kjer so ovire, kjer se robot ne more gibati. Bela polja predstavljajo mesta v prostoru kjer ni ovir in tam se robot v splošnem lahko giblje. Siva polja pa predstavljajo območje, ki ga ne poznamo.
 
@@ -122,7 +124,7 @@ Kot smo spoznali v prejšnjem poglavju je uporaba zemljevidov z visko ločljivos
 
 \section{Pregled možnih rešitev}
 
-Navdih za rešitev problema glajenja poti smo dobili na področju motornih športov. Tam se vozniki dirkalnih vozil izključno poslužujejo načina vožnje skozi ovinke, ki se mu pravi dirkalna linija (\textit{angl.: racing line}). Dirkalna linija je pot preko ovinka, ki vozniku dirkalnika omogoča najkrajši čas proge. Želja je, da je hitrost pri vožnji skozi ovinek karseda konstantna.
+Navdih za rešitev problema glajenja poti smo dobili na področju motornih športov. Tam se vozniki dirkalnih vozil izključno poslužujejo načina vožnje skozi ovinke, ki se mu pravi dirkalna linija (Angl.: \textit{racing line}). Dirkalna linija je pot preko ovinka, ki vozniku dirkalnika omogoča najkrajši čas proge \cite{vir2}. Želja je, da je hitrost pri vožnji skozi ovinek karseda konstantna.
 
 \begin{figure}[H]
 	\centering
@@ -133,23 +135,23 @@ Navdih za rešitev problema glajenja poti smo dobili na področju motornih špor
 
 Ideja za dirkalno linijo je ta, da se vozilo oklepa zunanjega roba ovinka pri vstopu v ovinek in se skuša karseda približati notranjemu robu ovinka na njegovem vrhu. Na izhodu iz ovinka pa se vozilo ponovno približa zunanjemu robu. V teoriji je optimalna pot skozi ovinek takšna, ki ima največji radij.
 
-Iskanje najboljše dirkalne linije za dano vozilo, na dani progi je eden od večjih problemov s katerim se srečujejo razvijalci dirkalnih računalniških iger. Komercialne dirkalne igre se ponavadi zanašajo na dirkalne linije, ki jih zasnujejo ljudje - strokovnjaki s področja dirkanja. Obstajajo pa tudi izjeme, ki se izognejo omenjeni metodi in se problema lotijo na povsem drugačen način. Dober primer je Colin McRae Rally, kjer dirkalno linijo računajo s pomočjo nevronske mreže, ki so jo učili strokovnjaki iz področja motornih športov. V Microsoft-ovi igri Forza Motorsport 2 s pomočjo tehnik nadzorovanega učenja (\textit{angl.: supervised learning}) učijo AI-je ter z aplikacijo evolucijskega računanja (\textit{angl.: evolutionary computation}) optimirajo njihove dirkalne linije.
+Iskanje najboljše dirkalne linije za dano vozilo, na dani progi je eden od večjih problemov s katerim se srečujejo razvijalci dirkalnih računalniških iger \cite{vir3}. Komercialne dirkalne igre se ponavadi zanašajo na dirkalne linije, ki jih zasnujejo ljudje - strokovnjaki s področja dirkanja. Obstajajo pa tudi izjeme, ki se izognejo omenjeni metodi in se problema lotijo na povsem drugačen način. Dober primer je Colin McRae Rally, kjer dirkalno linijo računajo s pomočjo nevronske mreže, ki so jo učili strokovnjaki iz področja motornih športov \cite{vir3}. V Microsoft-ovi igri Forza Motorsport 2 s pomočjo tehnik nadzorovanega učenja (Angl.: \textit{supervised learning}) učijo AI-je ter z aplikacijo evolucijskega računanja (Angl.: \textit{evolutionary computation}) optimirajo njihove dirkalne linije \cite{vir4}.
 
-Odprtokodne dirkalne igre se ponavadi zanašajo na hevristične pristope, ki tipično združujejo dobro prakso s hevristiko pri generaciji dirkalnih linij. Najuspešnejši primeri takšnih pristopov vključujejo K1999 algoritem, ki ga je razvil Remi Coulom in deluje na podlagi gradientnega spusta (\textit{angl.: gradient descent}) ter Simplix, ki ga je razvil Wolf-Dieter Beelitz za The Open Car Racing Simulator in bazira na preprosti hevristiki. Ostala uspešna primera sta tudi \textit{the bot}, ki ga je razvil Jussi Pajala za Robot Auto Racing Simulator (RARS) in je zasnovan na A* algoritmu ter the \textit{DougE1 bot} za RARS, ki ga je razvil Doug Elenveld, ta pa izkorišča genetski algoritem. Kljub temu, da omenjene rešitve temeljijo na različnih tehnikah je vsem skupno to, da skušajo zmanjšati ukrivlejnost poti vozila skozi ovinek, saj z manjšo ukrivlejnostjo poti vozilo lahko doseže večjo hitrost brez zdrsa.
+Odprtokodne dirkalne igre se ponavadi zanašajo na hevristične pristope, ki tipično združujejo dobro prakso s hevristiko pri generaciji dirkalnih linij. Najuspešnejši primeri takšnih pristopov vključujejo K1999 algoritem \cite{vir5}, ki ga je razvil Remi Coulom in deluje na podlagi gradientnega spusta (Angl.: \textit{gradient descent}) ter Simplix \cite{vir6}, ki ga je razvil Wolf-Dieter Beelitz za The Open Car Racing Simulator in bazira na preprosti hevristiki. Ostala uspešna primera sta tudi \textit{the bot} \cite{vir7}, ki ga je razvil Jussi Pajala za Robot Auto Racing Simulator (RARS) in je zasnovan na A* algoritmu ter the \textit{DougE1 bot} za RARS, ki ga je razvil Doug Elenveld, ta pa izkorišča genetski algoritem. Kljub temu, da omenjene rešitve temeljijo na različnih tehnikah je vsem skupno to, da skušajo zmanjšati ukrivlejnost poti vozila skozi ovinek, saj z manjšo ukrivlejnostjo poti vozilo lahko doseže večjo hitrost brez zdrsa.
 
-Zgoraj omenjene metode so sicer zelo impresivne, vendar obstajajo tudi metode, ki upoštevajo dinamski model vozila pri reševanju omenjenega problema in vodijo do še ustreznejših rešitev omenjenega problema. Na drugi strani pa imamo rešitve, ki so malce preprostejše kot je uporaba kubičnih parametričnih Bézier krivulj pri generaciji dirkalne linije in pa edinstvena rešitev, ki jo nudi odprtokodni Vamos Avtomotive Simulator, kjer je za doesganje manjše ukrivlejnosti poti skozi ovinek uporabljena vergia masnih točk, ki jih povezuje torzijska vzmet. Do zglajene poti pridemo tako, da najdemo minimum potencialne energije shranjene v vzmeteh. Pri reševanju našega problema smo se odločili za seldnjo metodo, zato jo bomo v naslednjem poglavju predstavili podrobneje.
+Zgoraj omenjene metode so sicer zelo impresivne, vendar obstajajo tudi metode, ki upoštevajo dinamski model vozila pri reševanju omenjenega problema in vodijo do še ustreznejših rešitev omenjenega problema. Na drugi strani pa imamo rešitve, ki so malce preprostejše kot je uporaba kubičnih parametričnih Bézier krivulj pri generaciji dirkalne linije \cite{vir8} in pa edinstvena rešitev, ki jo nudi odprtokodni Vamos Avtomotive Simulator, kjer je za doesganje manjše ukrivlejnosti poti skozi ovinek uporabljena vergia masnih točk, ki jih povezuje torzijska vzmet. Do zglajene poti pridemo tako, da najdemo minimum potencialne energije shranjene v vzmeteh. Pri reševanju našega problema smo se odločili za seldnjo metodo, zato jo bomo v naslednjem poglavju predstavili podrobneje.
 
 %\section{Algoritem glajenja poti - Vamos}
 \section{Izbrana rešitev}
 
-Vamos Avtomotive Simulator (VAS) je odprtokodno simulacijsko okolje s poudarkom na fizičnemu modeliranju \cite{VAS}. Vamos modelira veliko večino ključnih podsistemov avtomobilov, kot so elementi pogonskega sklopa in sicer motor, sklopka, menjalnik in diferencial z omejenim zdrsom. Prav tako pa je modelirano tudi obnašanje pnevmatik pri temperaturnih vplivih, vzmetenje avtomobila in aerodinamski učinki na avtomobilih. VAS igralcem nudi tudi igranje proti računalniškemu nasprotniku. V ta namen so razvijalci ustvarili algoritem izgradnje poti za računalniškega nasprotnika tako, da igralcem nudijo karseda realističen izziv. Ta algoritem bomo v naslednjem delu besedila vzeli pod drobnogled in ga nato tudi uporabili pri reševanju našega problema.
+Vamos Avtomotive Simulator (VAS) je odprtokodno simulacijsko okolje s poudarkom na fizičnemu modeliranju \cite{vir9}. Vamos modelira veliko večino ključnih podsistemov avtomobilov, kot so elementi pogonskega sklopa in sicer motor, sklopka, menjalnik in diferencial z omejenim zdrsom. Prav tako pa je modelirano tudi obnašanje pnevmatik pri temperaturnih vplivih, vzmetenje avtomobila in aerodinamski učinki na avtomobilih. VAS igralcem nudi tudi igranje proti računalniškemu nasprotniku. V ta namen so razvijalci ustvarili algoritem izgradnje poti za računalniškega nasprotnika tako, da igralcem nudijo karseda realističen izziv. Ta algoritem bomo v naslednjem delu besedila vzeli pod drobnogled in ga nato tudi uporabili pri reševanju našega problema.
 
 Pot vozila na začetku predstavlja nabor točk, ki tvorijo središčnico znotraj proge. Točke predstavimo kot masne točke, ki so med seboj povezane s torzijskimi vzmetmi.
 
 \begin{figure}[H]
 	\centering
 	\includegraphics[width=4cm]{pic/slika5.png}
-	\caption{Tri vozlišča poti. Kot $\theta$ povzorča moment \cite{VAS}.}
+	\caption{Tri vozlišča poti. Moment pri kotu $\theta$ \cite{vir9}.}
 	\label{fig:slika}
 \end{figure}
 
@@ -232,7 +234,7 @@ x_{i + 1} = x_{i} + \dot{x}_{i + 1} \Delta t
 Z iteriranjem algoritma se lega zglajenega nabora točk stabilizira. Pri tem se je potrebno zavedati, da je pot lahko groba v ostrih ovinkih.
 \end{comment}
 
-Tako dobimo enačbo s katero lahko iterativno določimo novo lego vsake točke poti, ki jo gladimo. Algoritem vsebuje dva paramtera in sicer maso $m$ in kvocient $d$. Pri tem se je potrebno zavedati, da je nova pot lahko groba v ostrih ovinkih (glej enačbo \ref{eq:1} in \ref{eq:2}).
+Tako dobimo enačbo s katero lahko iterativno določimo novo lego vsake točke poti, ki jo gladimo. Algoritem vsebuje dva paramtera in sicer maso $m$ in kvocient $d$. Pri tem se je potrebno zavedati, da je nova pot lahko groba v ostrih ovinkih (Enačba \ref{eq:1} in \ref{eq:2}).
 
 Spodnje slike prikazujejo delovanje dejanskega algoritma glajenja. Leva slika prikazuje graf niza točk nad katerimi bomo  izvajali glajenje. Sredinska slika prikazuje pravokotne poti po katerih bodo točke spreminjale svoj položaj z iteriranjem algoritma. Te pravokotne poti posameznih točk tvorijo tudi progo. Proga je ključna za glajenje poti, saj določa območje v katerem ga izvajamo. Na desni sliki vidimo niz točk v novi legi.
 
@@ -245,19 +247,19 @@ Spodnje slike prikazujejo delovanje dejanskega algoritma glajenja. Leva slika pr
 
 \section{Aplikacija algoritma}
 
-Z znanim algoritmom glajenja smo lahko pričeli na reševanju problema. Naloga je torej ustvariti vmesno vozlišče v ROS-u, ki jemlje podatke o obstoječi poti iz navigacijskega algoritma ter jih ustrezno transformira ter pošilja naslednjemu vozlišču, ki je odgovoren za izvajanje sledenja novo ustvarjeni poti. Pri določanju območja glajenja se bo upoštevala tudi prisotnost ovir, zato bo potrebno brati tudi informacije o zemljevidu vrednosti (\textit{costmap}). Preden zančenmo na delu s samim vozliščem pa je potrebno ustvariti okolje kjer naš program lahko preizkusimo.
+Z znanim algoritmom glajenja smo lahko pričeli na reševanju problema. Naloga je torej ustvariti vmesno vozlišče v ROS-u, ki jemlje podatke o obstoječi poti iz navigacijskega algoritma ter jih ustrezno transformira ter pošilja naslednjemu vozlišču, ki je odgovoren za izvajanje sledenja novo ustvarjeni poti. Pri določanju območja glajenja se bo upoštevala tudi prisotnost ovir, zato bo potrebno brati tudi informacije o zemljevidu vrednosti (Angl.: \textit{costmap}). Preden zančenmo na delu s samim vozliščem pa je potrebno ustvariti okolje kjer naš program lahko preizkusimo.
 
 \subsection{Priprava razvijalnega okolja}
 
-Omenjeno vozilo v razvoju ni bilo lahko razpoložljivo, zato nam na srečo ROS paket nudi povezljivost s simulacijskim okoljem Gazebo. Gazebo je odprtokodno simulacijsko okolje za testiranje robotov, ki nudi dinamske simulacije, 3D prikaz, generacijo poljubnega modela robota in okolja in še marsikaj drugega. Omenjeni program smo uporabljali v kombinaciji z ROS paketom RViz, ki nudi 3D prikaz robota, okolja ter prikaz vseh vrst senzorksih podatkov, kot so na primer točke zajete z laserskim merilnikom razdalje. V bistvu nam prikazuje kaj robot vidi. Najpomembnejše je to, da nam RViz prikazuje podatke o poti, ki jo nudi navigacijski algoritem in tako nudi takojšnjo preverbo. Da okolje izpopolnimo, potrebujemo še testno vozilo. Uporabili bomo paket, ki ga nudi spletni blog moorerobots \cite{moorerobots}, ta vsebuje preprosto vozilo z diferencialnim pogonom ter prirejeno realizacijo navgiacijskega algoritma. Delali bomo z ROS izvedbo Kinetic Kame na operacijskem sistemu Linux Ubuntu. Z definiranim okoljem sedaj lahko začnemo na razvoju omenjenega vozlišča vokolju ROS.
+Omenjeno vozilo v razvoju ni bilo lahko razpoložljivo, zato nam na srečo ROS paket nudi povezljivost s simulacijskim okoljem Gazebo. Gazebo je odprtokodno simulacijsko okolje za testiranje robotov, ki nudi dinamske simulacije, 3D prikaz, generacijo poljubnega modela robota in okolja in še marsikaj drugega. Omenjeni program smo uporabljali v kombinaciji z ROS paketom RViz, ki nudi 3D prikaz robota, okolja ter prikaz vseh vrst senzorksih podatkov, kot so na primer točke zajete z laserskim merilnikom razdalje. V bistvu nam prikazuje kaj robot vidi. Najpomembnejše je to, da nam RViz prikazuje podatke o poti, ki jo nudi navigacijski algoritem in tako nudi takojšnjo preverbo. Da okolje izpopolnimo, potrebujemo še testno vozilo. Uporabili bomo paket, ki ga nudi spletni blog moorerobots \cite{vir10}, ta vsebuje preprosto vozilo z diferencialnim pogonom ter prirejeno realizacijo navgiacijskega algoritma. Delali bomo z ROS izvedbo Kinetic Kame na operacijskem sistemu Linux Ubuntu. Z definiranim okoljem sedaj lahko začnemo na razvoju omenjenega vozlišča vokolju ROS.
 
 \subsection{ROS vozlišče}
 
 \subsubsection{Pomembnejše povezave vozlišča}
 
 
-Za navigacijo robota v okolju ROS skrbi t.i. navigacijski sklad (ang.: \textit{navigation stack}), katerega vozlišče se imenuje \verb|/move_base|. To vozlišče na podlagi podane ciljne točke, zemljevida okolice in bližnje okolice zaznane z laserskim merilnikom ustvari globalen načrt oziroma pot ter lokalno pot, katere namen je, da skuša vozilo karseda približati globalni. Glajena bo pot globalnega načrta, ki jo \verb|/move_base| pošilja po komunikacijski povezavi (\textit{topic}) \verb|/move_base/TrajectoryPlannerROS/global_plan|. Sporočila te povezave so tipa \verb|nav_msgs/Path| in nosijo informacijo o legah točk poti ter o orientaciji v ciljni točki. Ker se pri določanju območja glajenja upošteva tudi prisotnost ovir oziroma zemljevid vrednosti je potrebno brati tudi sporočila tipa \verb|nav_msgs/OccupancyGrid|, ki jih navigacijski sklad pošilja po povezavi \verb|/move_base/global_costmap/costmap|. Lega ovri se s časom lahko spreminja zato se tudi zemljevid vrednosti s časom spremija in posledično je potrebno njegovo informacijo dopolnjevati s sporočila tipa \verb|map_msgs/OccupancyGridUpdate|, ki jih dobimo preko kanala
-\verb|/move_base/global_costmap/costmap_updates|.
+Za navigacijo robota v okolju ROS skrbi t.i. navigacijski sklad (Angl.: \textit{navigation stack}), katerega vozlišče se imenuje \texttt{/move\_base}. To vozlišče na podlagi podane ciljne točke, zemljevida okolice in bližnje okolice zaznane z laserskim merilnikom ustvari globalen načrt oziroma pot ter lokalno pot, katere namen je, da skuša vozilo karseda približati globalni. Glajena bo pot globalnega načrta, ki jo \texttt{/move\_base} pošilja po komunikacijski povezavi (\textit{topic}) \texttt{/move\_base/TrajectoryPlannerROS/global\_plan}. Sporočila te povezave so tipa \texttt{nav\_msgs/Path} in nosijo informacijo o legah točk poti ter o orientaciji v ciljni točki. Ker se pri določanju območja glajenja upošteva tudi prisotnost ovir oziroma zemljevid vrednosti je potrebno brati tudi sporočila tipa \texttt{nav\_msgs/OccupancyGrid}, ki jih navigacijski sklad pošilja po povezavi \texttt{/move\_base/global\_costmap/costmap}. Lega ovri se s časom lahko spreminja zato se tudi zemljevid vrednosti s časom spremija in posledično je potrebno njegovo informacijo dopolnjevati s sporočila tipa \texttt{map\_msgs/OccupancyGridUpdate}, ki jih dobimo preko kanala \newline
+\texttt{/move\_base/global\_costmap/costmap\_updates}.
 
 \subsubsection{Delovanje vozlišča}
 
@@ -265,24 +267,24 @@ Vozlišče je zasnovano tako, da ima zavoljo enostavnosti uporabe avtomatizirano
 
 \subsubsection{Iskanje parametrov}
 
-Iskanje paramterov je izvedeno tako, da se ob zagonu vozlišča glajenja, ki smo ga poimenovali \verb|/path_smoothing_node| vozlišču \verb|/move_base| pošilja naključne cilje z ozirom na zemljevid vrednosti (če je cilj podan na mesto ovire nam navigacijski sklad ne ustvari poti). Namen tega je pridobitev ustrezno grobe poti na podlagi katere izvedemo optimizacijo s katero iščemo optimalne parametre. Ustreznost poti na kateri temelji optimizacija ocenimo na podlagi srednje vrednosti in standardne deviacije absolutne vrednosti kotov med posameznimi daljicami, ki tvorijo grobo pot.
+Iskanje paramterov je izvedeno tako, da se ob zagonu vozlišča glajenja, ki smo ga poimenovali \newline \texttt{/path\_smoothing\_node} vozlišču \texttt{/move\_base} pošilja naključne cilje z ozirom na zemljevid vrednosti (če je cilj podan na mesto ovire nam navigacijski sklad ne ustvari poti). Namen tega je pridobitev ustrezno grobe poti na podlagi katere izvedemo optimizacijo s katero iščemo optimalne parametre. Ustreznost poti na kateri temelji optimizacija ocenimo na podlagi srednje vrednosti in standardne deviacije absolutne vrednosti kotov med posameznimi daljicami, ki tvorijo grobo pot.
 
-Ko je ustrezna pot najdena začenmo z iskanjem minimuma kriterijske funkcije, ki je definirana kot srednja vrednost absolutnih kotov med odseki poti. Metoda iskanja ekstrema je Nelder-Mead, ki deluje na sledeč način. Pri tej metodi iščemo ekstrem funkcije z uporabo t.i. simplexa. To je $n+1$ dimenzionalen enakostraničen politop v $n$ parametrskem prostoru (slika \ref{fig:slika6}, primer a). V našem primeru optimiramo dva paramtera (masa in dušenje) zato je simplex enakostraničen trikotnik.
+Ko je ustrezna pot najdena začenmo z iskanjem minimuma kriterijske funkcije, ki je definirana kot srednja vrednost absolutnih kotov med odseki poti. Metoda iskanja ekstrema je Nelder-Mead, ki deluje na sledeč način. Pri tej metodi iščemo ekstrem funkcije z uporabo t.i. simplexa. To je $n+1$ dimenzionalen enakostraničen politop v $n$ parametrskem prostoru (Slika \ref{fig:slika6}, primer a). V našem primeru optimiramo dva paramtera (masa in dušenje) zato je simplex enakostraničen trikotnik.
 
 \begin{figure}[H]
 	\centering
 	\includegraphics[width=10cm]{pic/simplex.png}
-	\caption{Simplex (dodaj vir).}
+	\caption{Simplex \cite{vir11}.}
 	\label{fig:slika6}
 \end{figure}
 
-Prvi korak iskanja minimuma funkcije s simplexom je tvorba simplexa na podlagi začetnih približkov. Nato se najde točko na simplexu, ki vrne največjo vrednost kriterijske funkcije. To točko se nato preslika preko lika tako, da tvorimo nov simplex (\ref{fig:slika6}, primer b). Postopek ponavljamo toliko časa, dokler ne konvergiramo v okolico lokalnega minimuma.
+Prvi korak iskanja minimuma funkcije s simplexom je tvorba simplexa na podlagi začetnih približkov \cite{vir11}. Nato se najde točko na simplexu, ki vrne največjo vrednost kriterijske funkcije. To točko se nato preslika preko lika tako, da tvorimo nov simplex (Slika \ref{fig:slika6}, primer b). Postopek ponavljamo toliko časa, dokler ne konvergiramo v okolico lokalnega minimuma.
 
 Prednost metode je v tem, da ne potrebujemo matematično definirane kriterijske funckije (lahko je funkcija v programskem smislu) in posledičnega odvoda, ki ga za razliko od te metode potrebujejo gradientne metode.
 
 V našem primeru smo uporabili več začenih približkov z namenom bolj globalnega preiskovanja kriterijske funckije. Ko so z omenjenim pristopom najedni optimalni paramteri jih uporabimo v naslednjem stanju avtomata, ki predstavlja jedro vozlišča.
 
-Prvo stanje v vozlišče vnaša nekaj ROS paramterov, ki jih lahko nadziramo s paketom \verb|dynamic_reconfigure|. Te parametri so značilke na podlagi kerih iščemo grobo pot, to so torej srednja vrednost, standardna deviacija absolutnih kotov ter minimalna dolžina poti. Ko je nova pot pridobljena sledi še njena objava.
+Prvo stanje v vozlišče vnaša nekaj ROS paramterov, ki jih lahko nadziramo s paketom \newline \texttt{dynamic\_reconfigure}. Te parametri so značilke na podlagi kerih iščemo grobo pot, to so torej srednja vrednost, standardna deviacija absolutnih kotov ter minimalna dolžina poti. Ko je nova pot pridobljena sledi še njena objava.
 
 \subsubsection{Glajenje poti}
 
@@ -291,7 +293,7 @@ Jedro vozlišča, ki ga predstavlja glajenje poti je sestavljeno iz petih ključ
 \begin{figure}[H]
 	\centering
 	\includegraphics[width=10cm]{pic/obmocje.png}
-	\caption{Primer dolocanja območja glajenja v programu RViz.}
+	\caption{Primer določanja območja glajenja v programu RViz.}
 	\label{fig:slika_obm}
 \end{figure}
 
@@ -306,7 +308,7 @@ Polje točk grobe poti ter polji, ki tvorita območje galjenja se nato uporabi v
 
 \section{Rezultati}
 
-Na primeru navigacijskega paketa robota z bloga moorerobots (dodaj vir) sedaj preizkusimo delovanje ROS-ovega vozlišča. Na spodnji sliki (slika \ref{fig:slika7}) vidimo z modro označeno grobo pot ter rdečo gladko pot. S slike je moč ugotoviti očitno razliko v trajektoriji. Za primer na sliki znaša srednja vrednost absolutnih kotov grobe poti $5.54^{\circ} $, gladke pa $2.72^{\circ}$. V kontekstu povprečja kotov vidimo precejšnje izboljšanje. Gladka pot v temu primeru temelji na grobi poti kjer je med vsako točko poti vrinjena ena dodatna točka. Z dodajanjem dodatnih točk se računski čas precej poveča, medtem ko znatne spremembe v učinku ni moč opaziti. Če pogledamo sliko bolj podrobno, opazimo, da konca poti sovpadata (glej levo). Namen tega je, da s potjo skušamo robota postaviti v ciljno orientacijo.
+Na primeru navigacijskega paketa robota z bloga moorerobots \cite{vir10} sedaj preizkusimo delovanje ROS-ovega vozlišča. Na spodnji sliki (Slika \ref{fig:slika7}) vidimo z modro označeno grobo pot ter rdečo gladko pot. S slike je moč ugotoviti očitno razliko v trajektoriji. Za primer na sliki znaša srednja vrednost absolutnih kotov grobe poti $5.54^{\circ} $, gladke pa $2.72^{\circ}$. V kontekstu povprečja kotov vidimo precejšnje izboljšanje. Gladka pot v temu primeru temelji na grobi poti kjer je med vsako točko poti vrinjena ena dodatna točka. Z dodajanjem vmesnih točk se računski čas precej poveča, medtem ko znatne spremembe v učinku ni moč opaziti. Če pogledamo sliko bolj podrobno, na levi strani opazimo, da konca poti sovpadata. Namen tega je, da s potjo skušamo robota postaviti v ciljno orientacijo.
 
 \begin{figure}[H]
 	\centering
@@ -317,31 +319,62 @@ Na primeru navigacijskega paketa robota z bloga moorerobots (dodaj vir) sedaj pr
 
 \section{Zaključek}
 
-prednosti, slabosti, možne izboljšave + literatura
+Kot smo ugotovili je algoritem primeren za reševanje problema glajenja poti. Pri tem pa je potrebno omeniti, da je kvaliteta končne, gladke poti odvisna od najdenih optimalnih parametrov. Pogoj za uspešno glajenje je tudi stanje osnovne grobe poti, glajenje je namreč problematično ob prisotnosti zelo velikih kotov med odseki poti (okolica $90^{\circ}$). Končna pot je takem primeru popolnoma neuporabna. (dodaj sliko primera)
+
+Problemi bazične izvedbe algoritma tičijo v težko interpretabilnih parametrih, kar povzroča težave pri njihovemu nastavljanju s strani končnega uporabnika. Poleg tega pa se ustreznost paramterov spreminja nelinearno z dimenzijo problema. Kot smo ugotovili se ta problem da rešiti z aplikacijo optimizacijskih agloritmov, kjer iščemo paramtere tako, da nam le-te optimirajo ustrezno kriterijsko funkcijo, ki je odraz kvalitete poti. V našem primeru smo to storili tako, da poskušamo pridobiti ustrezno slabo pot iz navigacijskega algoritma ter na njeni osnovi poskušamo najti optimalne parametre. Takšna rešitev je ustrezna za primer kjer se inicializacija vozila izvaja v okolju s prisotnostjo ovir. Če ovir ni v okolici avtonomnega vozili, je pridobitev grobe poti iz navigacijskega algortma nemogoča in tako postane iskanje ustreznih paramterov neizvedljivo.
+
+Omenjeni problem iskanja paramterov bi bilo moč izboljšati tako, da se optimizacija izvaja na osnovi grobe poti, polja točka, ki je programu vedno na voljo (polje v programu ali tekstovna datoteka) in se ga pred izvajanjem skalira v skladu z dimenzijo problema. Ustrezni faktor bi bilo moč najti z še eno optimizacijo, na primer z minimizacijo napake med povprečinimi razdaljami grobe poti ter neke poti navigacijskega okolja avtonomnega vozila. Skalirni faktor bi bilo mogoče določiti tudi na podlagi informacije o ločljivosti zemljevida vrednosti.
+
+Ostali načrti za prihodnost bi lahko obsegali tudi preizkus na pravemu vozilu, prepis vozlišča v C++, ki ga ROS podpira poleg Python-a. S slednjim bi omogočili večjo učinkovitost v smislu zasedenosti računalniškega spomina in hitrosti računanja. 
+
+Na sliki \ref{fig:slika7} vidimo, da je glajenje poti dokaj lokalno ali z drugimi besedami, obstaja bolj neposredna pot od vozila do cilja. Za izboljšavo omnejenega opažanja bi lahko preizkusili uporabo lokalnih paramterov glajenja oziroma takšno glajenje, da ima vsaka točka glajenja poti svoj set paramterov. Pri tem problemu pa se je smiselno vprašati ali je to problem domene glajenja poti ali določanje globalne poti v okviru navigacijskega sklada.
+
+
+\begin{thebibliography}{10}
+
+\bibitem{vir1}   Wikipedia, Differential wheeled robot, \hskip 1em plus 0.5em minus 0.4em \url{https://en.wikipedia.org/wiki/Differential_
+wheeled_robot}
+
+\bibitem{vir2}   Wikipedia, Racing line, \hskip 1em plus 0.5em minus 0.4em \url{ https://en.wikipedia.org/wiki/Racing_line}
+
+\bibitem{vir3} L. Cardamone, D. Loiacono, P. L. Lanzi, A. P. Bardelli.  {\em Searching for
+the optimal racing line using genetic algorithms, in: Computational Intelligence and Games (CIG), 2010 IEEE Symposium on, IEEE, 2010, pp.
+388–394.}
+
+\bibitem{vir4} M. Pfeiffer.  {\em Machine learning applications in computer games, ÖGAI- 
+Journal 23 (3) (2004) 4–7.}
+
+\bibitem{vir5} R. Coulom.  {\em Reinforcement learning using neural networks, with applications to motor control, Ph.D. thesis, Institut National Polytechnique de
+Grenoble-INPG (2002).}
+
+\bibitem{vir6}   W.-D. Beelitz, Simplix, \hskip 1em plus 0.5em minus 0.4em \url{  http://www.simplix.wdbee-aorp.de/default.aspx}
+
+\bibitem{vir7}   RARS, Robot auto racing simulator, \hskip 1em plus 0.5em minus 0.4em \url{   http://rars.sourceforge.net/}
+
+\bibitem{vir8} M. Botta, V. Gautieri, D. Loiacono, P. L. Lanzi.  {\em Evolving the optimal
+racing line in a high-end racing game, in: Computational Intelligence and
+Games (CIG), 2012 IEEE Conference on, IEEE, 2012, pp. 108–115.}
+
+\bibitem{vir9}   S. Varner, Computer-controlled cars in vamos, \hskip 1em plus 0.5em minus 0.4em \url{http://vamos.sourceforge.net/
+computer-controlled-cars.pdf}
+
+\bibitem{vir10}   moorerobots, mybot, \hskip 1em plus 0.5em minus 0.4em \url{ http://moorerobots.com/blog}
+
+\bibitem{vir11} I. Škrjanc.  {\em Inteligentni sistemi za podporo odločanju, Ljubljana 2016.}
 
 
 
-\begin{comment}
-Algoritem je napisan v programskem jeziku Python in je v grobem sestavljen iz petih funkcij. Naloga prve funkcije je branje obstoječe, grobe poti in tvorjenje izhodnega podatka v obliki 2D niza točk, kjer prvi stolpec predstavlja x koordinate, drugi stolpec pa y koordinate nezglajene poti. Naloga druge funkcije je dodajanje vmesnih točk med točke nezglajene poti, saj je groba pot sestavljena iz malega števila točk. Tako omogočimo, da se postopek glajenja izvaja nad večjim številom točk, kar še dodatno pripomore k tvorbi ustreznejše poti. Tretja funkcija bere zemljevid vrednosti in informacijo o zemljevidu pretvarja v matriko čitljive oblike, kjer lega posameznega elementa sovpada s točko kartografiranega prostora. V tretji funkciji se določa širina območja glajenja in sicer tako, da se inkrementalno povečuje leva in desna meja območja nakar se za vsak inkrement širine preveri, če katera od koordinat leve in desne meje leži v območju ovire. To se izvede tako, da se koordinate leve in desne meje območja glajenja prevede v pripadajoče elemente matrike vrednosti in preveri, če je pripadajoča vrednost pod mejo. Ko z inkrementiranjem dosežemo oviro je prag sprejemljive vrednosti presežen in inkrementiranje se zaključi, s tem pa določimo širino območja glajenja. Širina območja inkrementalnega povečevanja širine je omejeno, saj bi se v okolici brez ovir inkrementiranje izvajalo, do roba zemljevida. Postopek se izvajala ločeno za levo in desno mejo.
-
-Četrta funkcija predstavlja jedro programa kjer se nahaja Vamos gladilni algoritem. V tem delu programa se torej izvaja transformacija točk prebranih iz druge funkcije. Ta funkcija vsebuje tudi vplivne parametre glajenja kot so masa točke, togostni koeficient, število iteracij algoritma ter širina proge, ki se jo določi v tretji funkciji. Izhodni podatek je ponovno 2D niz točk, le da so te transformirane. V tretji funkciji se izvaja prepis zglajenega niza točk v sporočila oblike \verb|nav_msgs/Path| ter njihovo oglaševanje po komunikacijskem kanalu \verb|/vamos|. Na ta kanal se nato poveže vozlišče odgovorno za vodenje robota po globalni poti.
-\end{comment}
-
-\begin{comment}
-\begin{figure}[H]
-	\centering
-	\includegraphics[width=8.9cm]{slika7.png}
-	\caption{Grafičen prikaz povezav.}
-	\label{fig:slika}
-\end{figure}
-\end{comment}
-
-\begin{comment}
-Vozlišče med drugim koristi tudi ROS-ov paket Dynamic Reconfigure, ki omogoča spreminjanje parametrov vozlišča tekom njegovega obratovanja. Z omenjenim paketom nudimo manipulacijo nad parametri v drugi, treji in četrti funkciji.
-\end{comment}
 
 
 
+
+
+
+
+
+
+
+\end{thebibliography}
 
 
 
