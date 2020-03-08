@@ -48,7 +48,7 @@
 		%\\[0.5cm]
 		%Asistent: dr. Gregor Čepon
 		\\[5cm]
-		Ljubljana, 30. 4. 2018
+		Ljubljana, 22. 10. 2019
 	\end{center}
 \end{titlepage}
 
@@ -88,7 +88,7 @@ Krmiljenje obravnavanega vozila nam omogoča programsko okolje \textit{Robot Ope
 
 ROS je sestavljen iz krmilnikov, ki so namenjeni branju podatkov iz senzorjev in pošiljanju ukazov aktuatorjem v dobro definiranem formatu. ROS sestavlja tudi velik in rastoči nabor fundamentalnih robotskih algoritmov, ki omogočajo gradnjo zemljevidov, navigacijo po le-teh, interpretacijo podatkov iz senzorjev, planiranju gibanj, manipuliranju predmetov in še mnogo več. Poleg tega nam nudi še celotno računsko infrastrukturo, ki nam omogoča manipuliranje s podatki tako, da povežemo različne komponente kompleksnega robotskega sistema in vključevanje lastnih algoritmov. ROS je že v osnovi porazdeljen in nam omogoča delitev delovne obremenitve med več računalniki brez težav. Nudi nam tudi nabor orodij za vizualizacijo stanja robota (Gazebo, RViz), algoritmov, za odkrivanje napak in za zajemanje senzorskih podatkov. Navsezadnje pa nam širši ekosistem ROS-a nudi obsežen nabor virov, kot je spletna enciklopedija ter forum, kjer se postavljajo vprašanja ter deli znanje.
 
-ROS torej tvori množica programov, ki delujejo istočasno in komunicirajo med sabo tako, da si med seboj pošiljajo sporočila (Angl.: \textit{message}), ki imajo natančno določeno obliko. Smiselna je grafična predstavitev sistema, kjer so programi vozlišča (Angl.: \textit{node}), robovi pa predstavljajo komunikacijske kanale (Angl.: \textit{topic}). Za primer si poglejmo spodnjo sliko (Slika \ref{fig:sl1}), kjer imamo vozlišče \texttt{/turtlebot\_teleop\_keyboard} s katerim pretvarjamo ukaze tipkovnice v sporočila oblike \texttt{geometry\_msgs/Twist}, ki nosijo informacijo o temu kako naj se robot premika (linearne, kotne hitrosti). Ta sporočila se nato po povezavi \texttt{/cmd\_vel} posreduje do vozlišča simulacijskega okolja Gazebo z istim imenom v kateremu se nahaja testni robot. Obstajajo standardna sporočila ter sporočila, ki jih ustvari uporabnik sam.
+ROS torej tvori množica programov, ki delujejo istočasno in komunicirajo med sabo tako, da si med seboj pošiljajo sporočila (\textit{message}), ki imajo natančno določeno obliko. Smiselna je grafična predstavitev sistema, kjer so programi vozlišča (\textit{node}), robovi pa predstavljajo komunikacijske kanale (\textit{topic}). Za primer si poglejmo spodnjo sliko (Slika \ref{fig:sl1}), kjer imamo vozlišče \texttt{/turtlebot\_teleop\_keyboard} s katerim pretvarjamo ukaze tipkovnice v sporočila oblike \texttt{geometry\_msgs/Twist}, ki nosijo informacijo o temu kako naj se robot premika (linearne, kotne hitrosti). Ta sporočila se nato po povezavi \texttt{/cmd\_vel} posreduje do vozlišča simulacijskega okolja Gazebo z istim imenom v kateremu se nahaja testni robot. Obstajajo standardna sporočila ter sporočila, ki jih ustvari uporabnik sam.
 
 \begin{figure}[H]
 	\centering
@@ -319,15 +319,17 @@ Na primeru navigacijskega paketa robota z bloga moorerobots \cite{vir10} sedaj p
 
 \section{Zaključek}
 
-Kot smo ugotovili je algoritem primeren za reševanje problema glajenja poti. Pri tem pa je potrebno omeniti, da je kvaliteta končne, gladke poti odvisna od najdenih optimalnih parametrov. Pogoj za uspešno glajenje je tudi stanje osnovne grobe poti, glajenje je namreč problematično ob prisotnosti zelo velikih kotov med odseki poti (okolica $90^{\circ}$). Končna pot je takem primeru popolnoma neuporabna. (dodaj sliko primera)
+Kot smo ugotovili je algoritem primeren za reševanje problema glajenja poti. Pri tem pa je potrebno omeniti, da je kvaliteta končne, gladke poti odvisna od najdenih optimalnih parametrov. Pogoj za uspešno glajenje je tudi stanje osnovne grobe poti, glajenje je namreč problematično ob prisotnosti zelo velikih kotov med odseki poti (okolica $90^{\circ}$). Končna pot je takem primeru neuporabna.
 
-Problemi bazične izvedbe algoritma tičijo v težko interpretabilnih parametrih, kar povzroča težave pri njihovemu nastavljanju s strani končnega uporabnika. Poleg tega pa se ustreznost paramterov spreminja nelinearno z dimenzijo problema. Kot smo ugotovili se ta problem da rešiti z aplikacijo optimizacijskih agloritmov, kjer iščemo paramtere tako, da nam le-te optimirajo ustrezno kriterijsko funkcijo, ki je odraz kvalitete poti. V našem primeru smo to storili tako, da poskušamo pridobiti ustrezno slabo pot iz navigacijskega algoritma ter na njeni osnovi poskušamo najti optimalne parametre. Takšna rešitev je ustrezna za primer kjer se inicializacija vozila izvaja v okolju s prisotnostjo ovir. Če ovir ni v okolici avtonomnega vozili, je pridobitev grobe poti iz navigacijskega algortma nemogoča in tako postane iskanje ustreznih paramterov neizvedljivo.
+Problemi bazične izvedbe algoritma tičijo v težko interpretabilnih parametrih, kar povzroča težave pri njihovemu nastavljanju s strani končnega uporabnika. Poleg tega pa se ustreznost paramterov spreminja nelinearno z dimenzijo problema. Kot smo ugotovili je ta problem mogoče rešiti z aplikacijo optimizacijskih agloritmov, kjer iščemo paramtere tako, da nam le-te optimirajo ustrezno kriterijsko funkcijo, ki je odraz kvalitete poti. V našem primeru smo to storili tako, da poskušamo pridobiti ustrezno slabo pot iz navigacijskega algoritma ter na njeni osnovi poskušamo najti optimalne parametre. Takšna rešitev je ustrezna za primer kjer se inicializacija vozila izvaja v okolju s prisotnostjo ovir. Če ovir ni v okolici avtonomnega vozili, je pridobitev grobe poti iz navigacijskega algortma nemogoča in tako postane iskanje ustreznih paramterov neizvedljivo.
 
 Omenjeni problem iskanja paramterov bi bilo moč izboljšati tako, da se optimizacija izvaja na osnovi grobe poti, polja točka, ki je programu vedno na voljo (polje v programu ali tekstovna datoteka) in se ga pred izvajanjem skalira v skladu z dimenzijo problema. Ustrezni faktor bi bilo moč najti z še eno optimizacijo, na primer z minimizacijo napake med povprečinimi razdaljami grobe poti ter neke poti navigacijskega okolja avtonomnega vozila. Skalirni faktor bi bilo mogoče določiti tudi na podlagi informacije o ločljivosti zemljevida vrednosti.
 
 Ostali načrti za prihodnost bi lahko obsegali tudi preizkus na pravemu vozilu, prepis vozlišča v C++, ki ga ROS podpira poleg Python-a. S slednjim bi omogočili večjo učinkovitost v smislu zasedenosti računalniškega spomina in hitrosti računanja. 
 
 Na sliki \ref{fig:slika7} vidimo, da je glajenje poti dokaj lokalno ali z drugimi besedami, obstaja bolj neposredna pot od vozila do cilja. Za izboljšavo omnejenega opažanja bi lahko preizkusili uporabo lokalnih paramterov glajenja oziroma takšno glajenje, da ima vsaka točka glajenja poti svoj set paramterov. Pri tem problemu pa se je smiselno vprašati ali je to problem domene glajenja poti ali določanje globalne poti v okviru navigacijskega sklada.
+
+\newpage
 
 
 \begin{thebibliography}{10}

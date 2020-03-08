@@ -16,4 +16,4 @@
 \contentsline {subsubsection}{\numberline {6.2.4}Glajenje poti}{8}
 \contentsline {section}{\numberline {7}Rezultati}{9}
 \contentsline {section}{\numberline {8}Zaklju\IeC {\v c}ek}{10}
-\contentsline {section}{\numberline {9}Literatura}{10}
+\contentsline {section}{\numberline {9}Literatura}{11}
