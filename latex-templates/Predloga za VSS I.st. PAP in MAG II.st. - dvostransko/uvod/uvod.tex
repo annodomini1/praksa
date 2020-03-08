@@ -1,0 +1,52 @@
+% !TeX spellcheck = si_SI
+\chapter{Uvod}\label{cha:uvod}
+
+\section{Ozadje problema}\label{sec:ozadje_problema}
+
+Reševanje problemov povezanih s transportom materiala in ostalih najrazličnejših paketov znotraj tovarn, se vse pogosteje rešuje z uporabo tako imenovanih avtonomno vodenih vozil. To so robotska vozila katerih edina nalgoa je razvoz materiala znotraj tovarn ali skladišč. Vozila te vrste se v najpreprostejši izvedbi po prostoru premikajo tako, da sledijo talnim črtam ali žicam. Navigacija takšnih vozil je lahko izvedena tudi na bolj zapleten način, in sicer na osnovi podatkov iz senzorjev kot sta lidar in kamera. Slednji primer je bolj zahteven, ker se pojavi potreba po navigacijskem sistemu. Ta skrbi za sportno tvorjenje poti posameznim vozilom tako, da ta ne trčijo drug v drugega ali v okoliške ovire.
+
+Pri razvoju takšnega avtonomnega vozila smo bili soočeni s problemom pri gibanju robota. Problem se pojavi pri ubiranju poti, ki jo tvori navigacijski algoritem vozila. Tvorjena pot je pogosto robata in vodi vozilo tako, da se to giblje energijsko neučinkovito in sunkovito. Posledice takšne, grobo tvorjene poti se odražajo v hitrejšem praznenju baterij. To pomeni, da je potrebno baterije vozila večkrat polniti in da je vozilo manj časa razpoložljivo. Zaradi sunkovitega gibanja obstaja tudi verjetnost za nastanek problemov povezanih s prevozom tovora.
+
+%Naša naloga je bila izboljšati pot, ki jo tvori navigacijski algoritem in posledično omogočiti vozilu, da bo delovalo energijsko učinkovitejše, zanesljivejše, ter da bo posledično vozilo na razpolago daljše časovno obdobje.
+
+
+
+
+\section{Cilji naloge}\label{sec:cilji_naloge}
+
+Razvoj ključnih sistemov za vodenje omenjenega robota se vrši v programskem okolju ROS (ang. \textit{Robot Operating System}). Ta nudi vrsto obstoječih orodij za upravljanje z roboti vseh vrst, omogoča pa tudi razvoj in vključevanje lastnih programskih rešitev. Cilji naloge obsegajo utemeljitev izvora težav, pregled možnih rešitev, izbira rešitve, teoretična razlaga ozadja izbrane rešitve in njena implementacija znotraj sistema ROS.
+
+
+%Problematiko, cilje in strukturo (opis vsebine, razdelitev po poglavjih) zaključnega dela predstavite v posebnem podpoglavju.
+%
+%V uvodu ne predstavljajte rezultatov in sklepov. V tem delu se osredotočite na to, kaj bo v delu predstavljeno in kako je delo strukturirano. Pišite, kaj boste delali, kaj pričakujete od teoretičnih in kaj od praktičnih raziskav ter kakšna so tveganja in nevarnosti, da teh ciljev ne boste dosegli. Pišite o hipotezah in ne o dobljenih rezultatih.
+
+
+%\section{Navodilo za uporabo predloge za zaključne naloge}\label{sec:uporaba_predloge}
+%V tej predlogi je v nevsebinskem delu zaključne naloge (do strani xxii) z [oglatimi oklepaji] označen tisti del besedila, ki ga mora študent oz. študentka spremeniti, da bo ustrezal njegovim oz. njenim podatkom ter podatkom o njegovi oz. njeni zaključni nalogi. Ker uporabljate \LaTeX~se Kazalo vsebine, Kazalo slik ter Kazalo preglednic obnovijo ob vsakem prevajanju.
+%
+%V tej predlogi so v vsebinskem delu zaključne naloge navodila in primeri za oblikovanje zaključne naloge. Celotno besedilo (ostanejo glavni naslovi: \nameref{cha:uvod}, \nameref{cha:teoreticne_osnove} itn.) mora študent oz. študenta nadomestiti z besedilom, ki vsebinsko ustreza njegovi oz. njeni zaključni nalogi.
+%
+%\subsection{Uporaba prednastavljenih slogov v predlogi}\label{sec:prednastavitve}
+%Za pisanje zaključne naloge uporabljajte to predlogo, v kateri so že \textbf{prednastavljeni slogi} za poenotenje končne oblike zaključnih nalog na FS.
+%
+%Kot je razvidno iz predloge, za naslove uporabljate naslednje ukaze:
+%\begin{itemize}
+%\item \verb|\chapter| za glavne naslove,
+%\item \verb|\section| za naslov 2. ravni,
+%\item \verb|\subsection| za naslov 3. ravni,
+%\item \verb|\subsubsection| za naslov 4. ravni,
+%\item \verb|\begin{itemize}\item\end{itemize}| za navajanje alinej.
+%\end{itemize}
+%
+%Za \textbf{naslove slik in preglednic} (in tudi številčenje enačb) uporabljajte možnost samodejnega številčenja, in sicer pod sliko ali nad preglednico. Naslov slike ali preglednice definirate z ukazom \verb|\caption{<>}|, oznako slike, enačbe in preglednice definirate z \verb|\label{<>}|, na njih se pa sklicujete z \verb|\ref{<>}| oz.~na enačbe z \verb|\eqref{<>}|. Tak način omogoča enostavno samodejno številčenje slik in preglednic (npr. da ni potrebno ročno popravljati številčenja, če v besedilu vrinete novo sliko oz. preglednico) ter tudi enostavno izdelavo seznama slik oz. seznama preglednic. \LaTeX ovi makri skrbijo, da se vsa številčena polja ob prevajanju samodejno posodobijo, vključno s seznami v nevsebinskem delu.
+%
+%Za vstavljanje enačbe, kot je npr. enačba \eqref{eqn:e} v poglavju \ref{sec:enacbe} \nameref{sec:enacbe}, uporabite okolje \verb|\begin{equation}<>\end{equation}|.
+%
+%\subsection{Sklicevanje na dele besedila}\label{sec:sklici}
+%
+%Sklicevanje na sliko, preglednico, enačbo ali del besedila je v \LaTeX u precej enostavno in enoznačno. Bodite pozorni, da pri sklicu na sliko oz. preglednico uporabite malo začetnico npr. \verb|slika \ref{<>}|. Pri sklicu na enačbo prav tako uporabite malo začetnico in postavite številko enačbe v oklepaje npr. \verb|enačba \eqref{<>}|.
+
+
+
+
